@@ -6,7 +6,7 @@ This document tracks technical assumptions (A1-A14) and verified findings.
 |---|---|---|---|
 | A1 | Synthea CSV export is opt-in | Verified | `tests/fixtures/synthea_csv` fixture will be committed for instant offline testing without Java requirement. |
 | A2 | FalkorDB vector index syntax and cosine similarity | To Verify | `CREATE VECTOR INDEX FOR (n:Note) ON (n.embedding) OPTIONS {dimension:384, similarityFunction:'cosine'}`. Need to confirm score direction (distance vs similarity). |
-| A3 | FalkorDB Docker configuration | Verified in docker-compose.yml | Configured with `REDIS_ARGS=--appendonly yes --appendfsync everysec` and data volume mapped to `/var/lib/falkordb/data`. |
+| A3 | FalkorDB Docker configuration | Verified | Verified with `falkordb/falkordb:latest` (v4.22.1); AOF enabled (`appendonly: yes`, `appendfsync: everysec`); persistent volume mapped to `/var/lib/falkordb/data`. |
 | A4 | Unique constraint syntax | To Verify | Range index must be created before `GRAPH.CONSTRAINT CREATE ... UNIQUE NODE`. Fallback to app-level checks in atomic statements if needed. |
 | A5 | Cypher features (`UNWIND`, `coalesce`, `CASE`, variable hops) | Standard openCypher | Will be verified in unit tests against live container in Step 01-03. |
 | A6 | Cypher transaction atomicity | Native | Each query is atomic in FalkorDB. Multi-graph operations coordinated via application logic. |

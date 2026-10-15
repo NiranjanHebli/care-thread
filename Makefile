@@ -1,4 +1,4 @@
-.PHONY: up down health schema ingest seed-clinic test test-iso loadtest bench ui lint clean
+.PHONY: up down health schema ingest seed-clinic test test-iso loadtest bench ui lint format clean
 
 PYTHON ?= uv run python
 PYTEST ?= uv run pytest
@@ -11,8 +11,10 @@ down:
 	docker compose down
 
 health:
-	@echo "Checking FalkorDB health..."
-	@docker compose exec -T falkordb redis-cli ping || echo "FalkorDB not reachable"
+	@echo "Checking FalkorDB ping..."
+	@docker compose exec -T falkordb redis-cli ping
+	@echo "Checking FalkorDB AOF persistence:"
+	@docker compose exec -T falkordb redis-cli config get appendonly
 
 schema:
 	$(PYTHON) -m carethread.db.schema

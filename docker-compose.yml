@@ -1,6 +1,6 @@
 services:
   falkordb:
-    image: falkordb/falkordb:v0.5.2
+    image: falkordb/falkordb:latest
     container_name: carethread_falkordb
     environment:
       - REDIS_ARGS=--appendonly yes --appendfsync everysec
@@ -16,6 +16,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+      start_period: 5s
 
 volumes:
   falkordb_data:

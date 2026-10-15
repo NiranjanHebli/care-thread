@@ -2,7 +2,7 @@
 
 ## Phase 0: Foundations & Setup (Current)
 - [x] **Step 00**: Scaffold repo layout, pyproject.toml, Makefile, AGENTS.md, opencode.json, .env.example, initial documentation.
-- [ ] **Step 01**: Docker Compose setup for FalkorDB with persistent AOF, healthcheck, and connectivity verification.
+- [x] **Step 01**: Docker Compose setup for FalkorDB with persistent AOF, healthcheck, and connectivity verification.
 - [ ] **Step 02**: `TenantRouter`, `ClinicReader` (strictly read-only), and tenant registry in `ct_control`.
 - [ ] **Step 03**: Schema bootstrap (`db/schema.py`) creating range indexes, unique constraints, and 384-dim vector indexes.
 
