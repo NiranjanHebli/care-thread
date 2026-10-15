@@ -86,6 +86,30 @@ class EpisodeNotFoundError(CareThreadError):
         super().__init__(message, code=code, details=details)
 
 
+class FactNotFoundError(CareThreadError):
+    """Raised when a specified fact does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Fact not found",
+        code: str = "FACT_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class ConflictStaleVersionError(CareThreadError):
+    """Raised when compare-and-swap (CAS) supersession detects an expected_version mismatch."""
+
+    def __init__(
+        self,
+        message: str = "Fact version conflict: expected_version does not match current version.",
+        code: str = "CONFLICT_STALE_VERSION",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
 class DatabaseError(CareThreadError):
     """Raised when graph database operation or verification fails."""
 

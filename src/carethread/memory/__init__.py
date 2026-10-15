@@ -10,6 +10,11 @@ from carethread.memory.episodes import (
     EpisodeManager,
     EpisodeRecord,
 )
+from carethread.memory.facts import (
+    FactManager,
+    FactRecord,
+    compute_slot,
+)
 from carethread.memory.sessions import (
     MessageRecord,
     SessionManager,
@@ -23,7 +28,10 @@ __all__ = [
     "get_embedder",
     "EpisodeManager",
     "EpisodeRecord",
+    "FactManager",
+    "FactRecord",
     "MessageRecord",
     "SessionManager",
     "SessionRecord",
+    "compute_slot",
 ]
