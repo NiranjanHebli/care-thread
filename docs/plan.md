@@ -12,8 +12,9 @@
 - [x] **Step 06**: Clinic graph seeding (`clinic_shared`) from YAML data (formularies, guidelines, allergen classes).
 
 ## Phase 2: Core Memory Layer
-- [ ] **Step 07**: Sessions, atomically sequenced messages, episodic chains (`NEXT`), injectable clock (`Clock.now()`), and ULID generators.
+- [x] **Step 07**: Sessions, atomically sequenced messages, episodic chains (`NEXT`), injectable clock (`Clock.now()`), and ULID generators.
 - [ ] **Step 08**: Semantic memory (`memory/facts.py`): bitemporal facts, CAS supersession, as-of point-in-time queries.
+
 - [ ] **Step 09**: Hybrid recall (`memory/recall.py`): fastembed vector search + Cypher graph traversal, score ranking, rejected reason classification.
 - [ ] **Step 10**: Safety checks & contradiction detection (`memory/safety.py`): cross-reactivity flags, drug-drug conflicts.
 

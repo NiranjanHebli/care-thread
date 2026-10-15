@@ -62,6 +62,30 @@ class PatientNotFoundError(CareThreadError):
         super().__init__(message, code=code, details=details)
 
 
+class SessionNotFoundError(CareThreadError):
+    """Raised when a specified session does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Session not found",
+        code: str = "SESSION_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class EpisodeNotFoundError(CareThreadError):
+    """Raised when a specified episode does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Episode not found",
+        code: str = "EPISODE_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
 class DatabaseError(CareThreadError):
     """Raised when graph database operation or verification fails."""
 
