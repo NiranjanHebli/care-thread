@@ -46,7 +46,7 @@ Instead of treating patient interactions as stateless chat sessions or simple ve
 - **Agent Interoperability**: Model Context Protocol (FastMCP Python SDK for stdio & streamable HTTP)
 - **LLMs & Embeddings**: Provider-neutral `LLMClient` (free open-weight models via OpenCode, replay cache, and mock deterministic mode); local embeddings with `fastembed` (`BAAI/bge-small-en-v1.5`, 384-dim)
 - **Frontend / UI**: React, Vite, TypeScript, Cytoscape.js
-- **Synthetic Data**: Synthea™ synthetic patient generator (Apache 2.0)
+- **Synthetic Data**: Synthea synthetic patient generator (Apache 2.0)
 - **Tooling & Testing**: `uv`, Pytest, Pytest-asyncio, Ruff, Mypy, Docker Compose
 
 ---
@@ -67,8 +67,8 @@ flowchart TD
     Dispatcher["Tool Dispatcher<br/>(Auth, Rate Limit, Tenant Routing, Audit)"]
 
     subgraph Storage["FalkorDB Graph Layer"]
-        PatientGraphs[("Patient Graphs (x M)<br/>patient_&lt;id&gt;<br/>• Episodic (Visits, Messages)<br/>• Semantic (Bitemporal Facts)<br/>• Procedural (Playbooks)<br/>• Handoff Packets & Traces")]
-        ClinicGraph[("Shared Clinic Graph<br/>clinic_shared (Read-Only)<br/>• Guidelines & Rules<br/>• Formularies & Drugs<br/>• Interactions & Cross-Reacts")]
+        PatientGraphs[("Patient Graphs (x M)<br/>patient_&lt;id&gt;<br/>- Episodic (Visits, Messages)<br/>- Semantic (Bitemporal Facts)<br/>- Procedural (Playbooks)<br/>- Handoff Packets & Traces")]
+        ClinicGraph[("Shared Clinic Graph<br/>clinic_shared (Read-Only)<br/>- Guidelines & Rules<br/>- Formularies & Drugs<br/>- Interactions & Cross-Reacts")]
     end
 
     UI -->|REST / SSE| Dispatcher
@@ -166,6 +166,35 @@ make schema
 make ingest
 make seed-clinic
 ```
+
+### Synthetic Patient Data Generation (Synthea)
+CareThread relies on synthetic patient records generated via [Synthea](https://github.com/synthetichealth/synthea) (Apache 2.0).
+
+#### 1. Instant Offline Test Fixture (Committed)
+A 10-patient synthetic dataset is pre-committed in `tests/fixtures/synthea_csv/`. It allows running unit tests (`pytest tests/unit/test_csv.py`) and fast local validation without any external dependencies or generation wait times.
+
+#### 2. Full Cohort Generation Script (100+ Patients)
+For hackathon demonstrations, UI visualization, and load testing, run the automated generation script:
+```bash
+# Generates 100 Massachusetts patients using seed 42 into data/synthea/csv/
+./scripts/synthea_generate.sh 42 100 Massachusetts data/synthea/csv
+```
+- **Automatic Fallback**: If host Java is missing, the script automatically executes Synthea via an `eclipse-temurin:17-jre` Docker container.
+- **Auto-Download**: If the generator jar is missing, the script fetches `synthea-with-dependencies.jar` from the official release.
+
+### Data Ingestion Pipeline
+To ingest generated or custom Synthea CSV records into isolated FalkorDB graphs (`patient_<id>`):
+```bash
+# Ingest dataset (defaults to data/synthea/csv or tests/fixtures/synthea_csv)
+make ingest
+
+# Or run the ingestion script directly with a custom directory
+uv run python scripts/ingest.py --data-dir data/synthea/csv
+```
+- **PII Stripping (TR-ING-01)**: Column allowlists drop all sensitive identifiers (SSN, driver's license, passport, address) at read time before graph insertion.
+- **Medication Normalization (TR-ING-03)**: Automatically maps raw medication descriptions to active ingredients (`normalize_med()`) for bitemporal facts and safety checks.
+- **Count Invariant (TR-ING-05)**: Ingestion asserts that created FalkorDB nodes match source CSV rows.
+
 
 ### Run Tests
 ```bash

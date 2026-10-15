@@ -1,0 +1,4 @@
+Id,ORGANIZATION,NAME,GENDER,SPECIALITY,ADDRESS,CITY,STATE,ZIP,LAT,LON,UTILIZATION
+prov-01,org-01,Dr. Sarah Jenkins,F,Internal Medicine,55 Fruit St,Boston,MA,02114,42.3631,-71.0686,1200
+prov-02,org-01,Dr. Robert Chen,M,Endocrinology,55 Fruit St,Boston,MA,02114,42.3631,-71.0686,950
+prov-03,org-02,Dr. Emily Walsh,F,Cardiology,75 Francis St,Boston,MA,02115,42.3364,-71.1070,1100

@@ -7,7 +7,7 @@
 - [x] **Step 03**: Schema bootstrap (`db/schema.py`) creating range indexes, unique constraints, and 384-dim vector indexes.
 
 ## Phase 1: Data Ingestion & Clinical Knowledge
-- [ ] **Step 04**: Synthea CSV parser with column allowlist (PII stripping) and offline synthetic test fixtures (`tests/fixtures/synthea_csv`).
+- [x] **Step 04**: Synthea CSV parser with column allowlist (PII stripping) and offline synthetic test fixtures (`tests/fixtures/synthea_csv`).
 - [ ] **Step 05**: Ingestion pipeline (`src/carethread/ingest/`) mapping Synthea entities to per-patient graphs (`patient_<id>`).
 - [ ] **Step 06**: Clinic graph seeding (`clinic_shared`) from YAML data (formularies, guidelines, allergen classes).
 

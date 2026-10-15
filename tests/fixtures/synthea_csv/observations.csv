@@ -1,0 +1,16 @@
+DATE,PATIENT,ENCOUNTER,CATEGORY,CODE,DESCRIPTION,VALUE,UNITS,TYPE
+2023-01-10T09:15:00Z,a1000001-0000-0000-0000-000000000001,enc-01,vital-signs,8480-6,Systolic Blood Pressure,138,mm[Hg],numeric
+2023-01-10T09:15:00Z,a1000001-0000-0000-0000-000000000001,enc-01,vital-signs,8462-4,Diastolic Blood Pressure,86,mm[Hg],numeric
+2023-06-15T14:15:00Z,a1000001-0000-0000-0000-000000000001,enc-02,laboratory,4548-4,Hemoglobin A1c/Hemoglobin.total in Blood,7.8,%,numeric
+2023-06-15T14:15:00Z,a1000001-0000-0000-0000-000000000001,enc-02,laboratory,2339-0,Glucose [Mass/volume] in Blood,162,mg/dL,numeric
+2023-06-15T14:15:00Z,a1000001-0000-0000-0000-000000000001,enc-02,vital-signs,39156-5,Body Mass Index,31.2,kg/m2,numeric
+2023-02-20T10:15:00Z,a1000001-0000-0000-0000-000000000002,enc-03,vital-signs,8480-6,Systolic Blood Pressure,142,mm[Hg],numeric
+2023-08-12T11:15:00Z,a1000001-0000-0000-0000-000000000002,enc-04,vital-signs,8480-6,Systolic Blood Pressure,130,mm[Hg],numeric
+2023-03-05T08:45:00Z,a1000001-0000-0000-0000-000000000003,enc-05,laboratory,19868-9,Peak expiratory flow,420,L/min,numeric
+2023-04-18T13:15:00Z,a1000001-0000-0000-0000-000000000004,enc-06,laboratory,2093-3,Cholesterol in Serum or Plasma,235,mg/dL,numeric
+2023-05-22T09:20:00Z,a1000001-0000-0000-0000-000000000005,enc-07,vital-signs,8867-4,Heart rate,78,/min,numeric
+2023-07-07T15:10:00Z,a1000001-0000-0000-0000-000000000006,enc-08,laboratory,3016-3,Thyrotropin [Units/volume] in Serum or Plasma,3.8,u[IU]/mL,numeric
+2023-09-14T10:40:00Z,a1000001-0000-0000-0000-000000000007,enc-09,laboratory,2160-0,Creatinine in Serum or Plasma,1.4,mg/dL,numeric
+2023-10-02T11:15:00Z,a1000001-0000-0000-0000-000000000008,enc-10,vital-signs,8310-5,Body temperature,38.2,Cel,numeric
+2023-11-19T14:20:00Z,a1000001-0000-0000-0000-000000000009,enc-11,laboratory,6301-6,INR in Platelet poor plasma,2.4,{INR},numeric
+2023-12-05T09:40:00Z,a1000001-0000-0000-0000-000000000010,enc-12,vital-signs,72514-3,Pain severity - 0-10 verbal numeric rating,6,{score},numeric

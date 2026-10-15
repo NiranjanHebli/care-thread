@@ -40,3 +40,8 @@ falkordb_data/
 .DS_Store
 
 assignment/
+
+# Generated Synthea datasets and binaries
+*.jar
+data/synthea/
+
