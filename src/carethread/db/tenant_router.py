@@ -57,6 +57,16 @@ class TenantRouter:
         """Returns a strictly read-only reader for the shared clinic graph."""
         return ClinicReader(self._client)
 
+    def bootstrap_patient(self, patient_id: str) -> Any:
+        """Bootstraps schema (range indexes, constraints, vector indexes) for the patient graph.
+
+        Idempotent operation.
+        """
+        from carethread.db.schema import bootstrap_patient_graph
+
+        g = self.graph(patient_id)
+        return bootstrap_patient_graph(g, self._client)
+
     # -------------------------------------------------------------------------
     # Tenant Registry Operations (in `ct_control`)
     # -------------------------------------------------------------------------
@@ -65,10 +75,12 @@ class TenantRouter:
         self,
         patient_id: str,
         metadata: dict[str, Any] | None = None,
+        bootstrap_schema: bool = False,
     ) -> dict[str, Any]:
         """Registers a patient in the ct_control tenant registry.
 
         Idempotent: merges the node if it already exists.
+        Optionally bootstraps schema for the patient graph if bootstrap_schema is True.
         """
         valid_pid = self.validate_patient_id(patient_id)
         now_ts = int(time.time())
@@ -88,12 +100,18 @@ class TenantRouter:
             },
         )
         row = res.result_set[0]
+
+        bootstrap_res = None
+        if bootstrap_schema:
+            bootstrap_res = self.bootstrap_patient(valid_pid)
+
         return {
             "id": row[0],
             "status": row[1],
             "created_at": row[2],
             "graph_name": f"patient_{valid_pid}",
             "metadata": meta,
+            "bootstrap_result": bootstrap_res,
         }
 
     def is_registered(self, patient_id: str) -> bool:
