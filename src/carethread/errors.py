@@ -60,3 +60,15 @@ class PatientNotFoundError(CareThreadError):
         details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message, code=code, details=details)
+
+
+class DatabaseError(CareThreadError):
+    """Raised when graph database operation or verification fails."""
+
+    def __init__(
+        self,
+        message: str = "Database operation failed",
+        code: str = "DATABASE_ERROR",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)

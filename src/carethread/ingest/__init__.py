@@ -1,5 +1,12 @@
 """Ingest package exports."""
 
+from carethread.ingest.mapper import (
+    IngestDatasetResult,
+    IngestPatientResult,
+    PatientGraphMapper,
+    ingest_dataset,
+    synthea_id_to_patient_id,
+)
 from carethread.ingest.synthea_csv import (
     ALLERGIES_ALLOWLIST,
     CONDITIONS_ALLOWLIST,
@@ -52,4 +59,9 @@ __all__ = [
     "ObservationRecord",
     "ProviderRecord",
     "OrganizationRecord",
+    "PatientGraphMapper",
+    "synthea_id_to_patient_id",
+    "IngestPatientResult",
+    "IngestDatasetResult",
+    "ingest_dataset",
 ]

@@ -8,7 +8,7 @@
 
 ## Phase 1: Data Ingestion & Clinical Knowledge
 - [x] **Step 04**: Synthea CSV parser with column allowlist (PII stripping) and offline synthetic test fixtures (`tests/fixtures/synthea_csv`).
-- [ ] **Step 05**: Ingestion pipeline (`src/carethread/ingest/`) mapping Synthea entities to per-patient graphs (`patient_<id>`).
+- [x] **Step 05**: Ingestion pipeline (`src/carethread/ingest/`) mapping Synthea entities to per-patient graphs (`patient_<id>`).
 - [ ] **Step 06**: Clinic graph seeding (`clinic_shared`) from YAML data (formularies, guidelines, allergen classes).
 
 ## Phase 2: Core Memory Layer
