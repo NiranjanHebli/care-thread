@@ -1,0 +1,14 @@
+roles:
+  agent:
+    - opencode/nemotron-3-ultra-free
+    - opencode/mimo-v2.6-flash-free
+    - opencode/longcat-2.5-preview-free
+  extract:
+    - opencode/mimo-v2.6-flash-free
+    - opencode/nemotron-3-ultra-free
+  judge:
+    - opencode/step-5-preview-free
+    - opencode/mimo-v2.6-flash-free
+  small:
+    - opencode/nemotron-3.5-lightning-free
+    - opencode/mimo-v2.6-flash-free

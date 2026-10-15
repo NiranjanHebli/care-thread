@@ -1,0 +1,21 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:v0.5.2
+    container_name: carethread_falkordb
+    environment:
+      - REDIS_ARGS=--appendonly yes --appendfsync everysec
+      - FALKORDB_ARGS=THREAD_COUNT 8 TIMEOUT_MAX 30000
+    volumes:
+      - falkordb_data:/var/lib/falkordb/data
+    ports:
+      - "6379:6379"
+      - "3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  falkordb_data:
