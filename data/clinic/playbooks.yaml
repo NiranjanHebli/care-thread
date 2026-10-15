@@ -1,0 +1,39 @@
+# Standardized Clinical Playbook Templates
+# Defines standardized episode pathways and operational steps.
+
+playbook_templates:
+  - id: "pb_ambulatory_intake"
+    name: "Ambulatory Outpatient Intake Protocol"
+    episode_type: "ambulatory"
+    steps:
+      - "Verify active demographic and insurance eligibility."
+      - "Perform complete medication reconciliation comparing active graph facts against patient-reported regimen."
+      - "Capture vital signs including seated blood pressure, heart rate, and BMI."
+      - "Screen for active drug and environmental allergies."
+
+  - id: "pb_ed_chest_pain"
+    name: "Emergency Department Acute Chest Pain Pathway"
+    episode_type: "emergency"
+    steps:
+      - "Acquire 12-lead ECG within 10 minutes of arrival."
+      - "Draw baseline high-sensitivity cardiac troponin."
+      - "Check allergy graph for Aspirin hypersensitivity before chewable aspirin administration."
+      - "Establish continuous cardiac monitoring and IV access."
+
+  - id: "pb_diabetes_followup"
+    name: "Diabetic Chronic Care Review Pathway"
+    episode_type: "ambulatory"
+    steps:
+      - "Review latest HbA1c value from observation graph."
+      - "Evaluate renal function (eGFR and urine albumin-to-creatinine ratio)."
+      - "Perform comprehensive monofilament diabetic foot examination."
+      - "Verify adherence to Metformin or insulin therapy."
+
+  - id: "pb_discharge_medrec"
+    name: "Inpatient Discharge Medication Reconciliation Protocol"
+    episode_type: "inpatient"
+    steps:
+      - "Reconcile discharge prescription orders against admission home medication list."
+      - "Verify drug-drug interaction safety via clinic_shared rules."
+      - "Issue patient-facing education sheet for newly started medications."
+      - "Transmit handoff task to primary outpatient clinical provider."

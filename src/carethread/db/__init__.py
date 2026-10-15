@@ -14,6 +14,11 @@ if TYPE_CHECKING:
         bootstrap_control_graph,
         bootstrap_patient_graph,
     )
+    from carethread.db.seed_clinic import (
+        ClinicSeeder,
+        ClinicSeedResult,
+        seed_clinic,
+    )
 
 __all__ = [
     "get_db_client",
@@ -25,6 +30,9 @@ __all__ = [
     "bootstrap_control_graph",
     "bootstrap_all",
     "SchemaBootstrapResult",
+    "seed_clinic",
+    "ClinicSeeder",
+    "ClinicSeedResult",
 ]
 
 
@@ -39,4 +47,8 @@ def __getattr__(name: str):
         import carethread.db.schema as schema_mod
 
         return getattr(schema_mod, name)
+    if name in {"seed_clinic", "ClinicSeeder", "ClinicSeedResult"}:
+        import carethread.db.seed_clinic as seed_mod
+
+        return getattr(seed_mod, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

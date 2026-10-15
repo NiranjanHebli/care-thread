@@ -1,0 +1,100 @@
+# Clinical Practice Guidelines and Rules
+# Defines guidelines, associated rules, condition codes, and recommended drug classes.
+
+guidelines:
+  - id: "gdl_htn_aha_2024"
+    title: "AHA/ACC 2024 Clinical Practice Guideline for the Management of High Blood Pressure"
+    version: "2024.1"
+    text: "Guideline for comprehensive blood pressure control in adults. Emphasizes early dual therapy, lifestyle modification, and strict monitoring of serum creatinine and potassium for renin-angiotensin-aldosterone system inhibitors."
+    condition_code:
+      code: "38341003"
+      system: "SNOMED-CT"
+      display: "Essential hypertension"
+    recommends_classes:
+      - "dc_ace_inhibitors"
+      - "dc_arbs"
+      - "dc_thiazides"
+      - "dc_calcium_channel_blockers"
+    rules:
+      - id: "rule_htn_01"
+        kind: "checklist"
+        text: "Target blood pressure is below 130/80 mmHg for all adult patients with confirmed hypertension."
+        severity: "high"
+      - id: "rule_htn_02"
+        kind: "contraindication"
+        text: "Do not combine ACE inhibitors with Angiotensin Receptor Blockers due to severe hyperkalemia and acute kidney injury risk."
+        severity: "critical"
+      - id: "rule_htn_03"
+        kind: "escalation"
+        text: "If blood pressure remains above 140/90 mmHg on single agent, escalate to dual therapy combining ACE inhibitor or ARB with dihydropyridine calcium channel blocker or thiazide."
+        severity: "high"
+      - id: "rule_htn_04"
+        kind: "checklist"
+        text: "Check basic metabolic panel including serum potassium and creatinine within 2 to 4 weeks of starting an ACE inhibitor or ARB."
+        severity: "moderate"
+
+  - id: "gdl_t2dm_ada_2024"
+    title: "ADA Standards of Care in Diabetes 2024"
+    version: "2024.1"
+    text: "Standards of medical care in diabetes mellitus. First-line therapy centers on Metformin combined with lifestyle interventions, tailored glycemic targets, and continuous monitoring of renal function and glycated hemoglobin."
+    condition_code:
+      code: "44054006"
+      system: "SNOMED-CT"
+      display: "Type 2 diabetes mellitus"
+    recommends_classes:
+      - "dc_biguanides"
+    rules:
+      - id: "rule_t2dm_01"
+        kind: "checklist"
+        text: "Metformin is preferred first-line pharmacologic therapy for comprehensive management of type 2 diabetes."
+        severity: "high"
+      - id: "rule_t2dm_02"
+        kind: "contraindication"
+        text: "Metformin is contraindicated if estimated glomerular filtration rate eGFR is below 30 mL/min/1.73m2 due to lactic acidosis risk."
+        severity: "critical"
+      - id: "rule_t2dm_03"
+        kind: "checklist"
+        text: "Check HbA1c at least twice yearly in patients meeting treatment goals and quarterly in patients whose therapy has changed."
+        severity: "moderate"
+
+  - id: "gdl_strep_idsa_2024"
+    title: "IDSA Clinical Practice Guideline for the Diagnosis and Management of Group A Streptococcal Pharyngitis"
+    version: "2024.1"
+    text: "IDSA clinical guidance for acute streptococcal pharyngitis. Recommends oral narrow-spectrum penicillins as first-line antimicrobial therapy and mandates strict contraindication screening for beta-lactam hypersensitivity."
+    condition_code:
+      code: "43878008"
+      system: "SNOMED-CT"
+      display: "Streptococcal sore throat"
+    recommends_classes:
+      - "dc_penicillins"
+      - "dc_cephalosporins"
+    rules:
+      - id: "rule_strep_01"
+        kind: "checklist"
+        text: "Penicillin V Potassium or Amoxicillin for 10 days remains the treatment of choice for patients without penicillin allergy."
+        severity: "high"
+      - id: "rule_strep_02"
+        kind: "contraindication"
+        text: "Do not administer penicillins or first-generation cephalosporins to patients with documented anaphylaxis or severe IgE-mediated beta-lactam hypersensitivity."
+        severity: "critical"
+
+  - id: "gdl_cad_aha_2024"
+    title: "AHA/ACC Guideline on the Management of Chronic Coronary Artery Disease"
+    version: "2024.1"
+    text: "Clinical practice guidelines for secondary prevention of chronic coronary artery disease. Focuses on lipid-lowering with high-intensity statins, antiplatelet therapy with low-dose aspirin, and risk factor modification."
+    condition_code:
+      code: "53741008"
+      system: "SNOMED-CT"
+      display: "Coronary arteriosclerosis"
+    recommends_classes:
+      - "dc_statins"
+      - "dc_nsaids"
+    rules:
+      - id: "rule_cad_01"
+        kind: "checklist"
+        text: "Initiate high-intensity statin therapy (Atorvastatin 40 to 80 mg daily) for all patients with established atherosclerotic cardiovascular disease."
+        severity: "high"
+      - id: "rule_cad_02"
+        kind: "checklist"
+        text: "Low-dose aspirin 81 mg daily is recommended for secondary prevention in patients with established coronary artery disease."
+        severity: "high"

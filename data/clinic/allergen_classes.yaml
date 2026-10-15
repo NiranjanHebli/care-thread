@@ -1,0 +1,79 @@
+# Clinical Allergen Classes and Cross-Reactivities
+# Defines allergen classes, member codes, and structural drug class cross-reactivities.
+
+allergen_classes:
+  - id: "alg_beta_lactam"
+    name: "Beta-Lactam Antibiotics"
+    description: "Antibiotics containing a beta-lactam core ring structure."
+    cross_reacts_with:
+      - "dc_penicillins"
+      - "dc_cephalosporins"
+      - "dc_carbapenems"
+    allergen_codes:
+      - code: "300916003"
+        system: "SNOMED-CT"
+        display: "Allergy to penicillin"
+      - code: "300913006"
+        system: "SNOMED-CT"
+        display: "Allergy to amoxicillin"
+      - code: "91936005"
+        system: "SNOMED-CT"
+        display: "Allergy to penicillin (substance)"
+      - code: "7980"
+        system: "RxNorm"
+        display: "Penicillin class allergy"
+      - code: "372687004"
+        system: "SNOMED-CT"
+        display: "Allergy to cephalosporin"
+
+  - id: "alg_nsaids"
+    name: "Non-Steroidal Anti-Inflammatory Drugs"
+    description: "COX-1 and COX-2 inhibitor hypersensitivity."
+    cross_reacts_with:
+      - "dc_nsaids"
+    allergen_codes:
+      - code: "294874005"
+        system: "SNOMED-CT"
+        display: "Allergy to non-steroidal anti-inflammatory agent"
+      - code: "293586001"
+        system: "SNOMED-CT"
+        display: "Allergy to aspirin"
+      - code: "293587005"
+        system: "SNOMED-CT"
+        display: "Allergy to ibuprofen"
+
+  - id: "alg_sulfonamides"
+    name: "Sulfonamide Antibiotics"
+    description: "Antibacterial sulfonamides containing arylamine group at N4 position."
+    cross_reacts_with:
+      - "dc_sulfonamides"
+    allergen_codes:
+      - code: "293584003"
+        system: "SNOMED-CT"
+        display: "Allergy to sulfonamides"
+      - code: "91937001"
+        system: "SNOMED-CT"
+        display: "Allergy to sulfamethoxazole"
+
+  - id: "alg_statins"
+    name: "HMG-CoA Reductase Inhibitors"
+    description: "Statin class-associated myopathy and hypersensitivity."
+    cross_reacts_with:
+      - "dc_statins"
+    allergen_codes:
+      - code: "419511003"
+        system: "SNOMED-CT"
+        display: "Propensity to adverse reaction to statin"
+
+  - id: "alg_opioids"
+    name: "Opioid Analgesics"
+    description: "True IgE-mediated or pseudo-allergic histamine release from opioids."
+    cross_reacts_with:
+      - "dc_opioids"
+    allergen_codes:
+      - code: "373529000"
+        system: "SNOMED-CT"
+        display: "Allergy to morphine"
+      - code: "293637006"
+        system: "SNOMED-CT"
+        display: "Allergy to codeine"
