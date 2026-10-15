@@ -82,6 +82,46 @@ flowchart TD
 2. **Action & Coordination**: New observations are recorded with atomic supersession. Downstream tasks are passed via graph-stored `Handoff` packets.
 3. **Trace Commitment**: Answers cite graph node IDs; the system validates support, logs an audit trail, and generates the provenance subgraph.
 
+### Agent Interaction Workflow
+
+The sequence below illustrates how clinical agents (Intake, Specialist, and Pharmacy) collaborate across visit stages via atomic graph handoffs and shared clinical rules:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Patient as Patient / Clinician
+    participant Intake as Intake Agent
+    participant Dispatcher as Tool Dispatcher
+    participant Memory as Patient Graph (FalkorDB)
+    participant Clinic as Shared Clinic Graph
+    participant Specialist as Specialist Agent
+    participant Pharmacy as Pharmacy Agent
+
+    Note over Patient,Intake: Visit Intake & Observation
+    Patient->>Intake: Reports symptom & medication update
+    Intake->>Dispatcher: recall(session_id, query)
+    Dispatcher->>Memory: Hybrid vector & graph traversal
+    Memory-->>Intake: Episodic notes & active facts
+    Intake->>Dispatcher: remember(fact, CAS supersession)
+    Dispatcher->>Memory: Write Fact & SUPERSEDES edge
+    Intake->>Dispatcher: handoff(to_role='specialist', goal, packet)
+    Dispatcher->>Memory: Create Handoff node (status: open)
+
+    Note over Specialist,Pharmacy: Specialist Evaluation & Referral
+    Specialist->>Dispatcher: accept_handoff(handoff_id)
+    Dispatcher->>Memory: CAS transition (open -> accepted)
+    Specialist->>Dispatcher: handoff(to_role='pharmacy', proposed_rx)
+    Dispatcher->>Memory: Create Handoff node (status: open)
+
+    Note over Pharmacy,Clinic: Safety Check & Trace Commitment
+    Pharmacy->>Dispatcher: accept_handoff(handoff_id)
+    Pharmacy->>Dispatcher: recall(include_clinic=true)
+    Dispatcher->>Clinic: Cross-graph lookup (Allergies & Rules)
+    Clinic-->>Pharmacy: Drug class & cross-reactivity match
+    Pharmacy->>Dispatcher: Flag conflict & commit_answer(claims, trace)
+    Dispatcher->>Memory: Write Flag & Answer with USED citations
+```
+
 ---
 
 ## Setup and Installation
