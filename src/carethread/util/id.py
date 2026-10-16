@@ -153,3 +153,18 @@ def deletion_request_id() -> str:
 def tombstone_id() -> str:
     """Generate a new Tombstone identifier (tmb_<ulid>)."""
     return ulid_prefixed("tmb")
+
+
+def retrieval_id() -> str:
+    """Generate a new Retrieval identifier (ret_<ulid>)."""
+    return ulid_prefixed("ret")
+
+
+def trace_id() -> str:
+    """Generate a new Trace identifier (trc_<ulid>)."""
+    return ulid_prefixed("trc")
+
+
+def request_id() -> str:
+    """Generate a new Request identifier (req_<ulid>)."""
+    return ulid_prefixed("req")

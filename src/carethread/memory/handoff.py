@@ -64,8 +64,14 @@ class HandoffPacket:
     open_questions: list[dict[str, Any]] = field(default_factory=list)
     actions: list[dict[str, Any]] = field(default_factory=list)
 
+    @property
+    def handoff_id(self) -> str:
+        return self.id
+
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d["handoff_id"] = self.id
+        return d
 
 
 class HandoffManager:

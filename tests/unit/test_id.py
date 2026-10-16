@@ -20,8 +20,11 @@ from carethread.util.id import (
     parse_ulid_timestamp,
     playbook_id,
     playbook_step_id,
+    request_id,
+    retrieval_id,
     session_id,
     tombstone_id,
+    trace_id,
     ulid_prefixed,
 )
 
@@ -66,6 +69,9 @@ def test_domain_helpers() -> None:
     assert is_valid_prefixed_ulid(consolidation_id(), "cns")
     assert is_valid_prefixed_ulid(deletion_request_id(), "del")
     assert is_valid_prefixed_ulid(tombstone_id(), "tmb")
+    assert is_valid_prefixed_ulid(retrieval_id(), "ret")
+    assert is_valid_prefixed_ulid(trace_id(), "trc")
+    assert is_valid_prefixed_ulid(request_id(), "req")
 
 
 def test_parse_ulid_timestamp() -> None:

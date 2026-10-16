@@ -23,7 +23,7 @@
 - [x] **Step 12**: Audit logging engine (`memory/audit.py`): synchronous writes, batched read flushing.
 - [x] **Step 13**: Procedural memory & background worker: consolidation runs, playbook promotions, decay marking.
 - [x] **Step 14**: Deletion & retention (`forget_request`, cryptographically secure tombstones).
-- [ ] **Step 15**: Unified tool dispatcher and FastMCP server (`src/carethread/mcp/`).
+- [x] **Step 15**: Unified tool dispatcher and FastMCP server (`src/carethread/mcp/`).
 
 ## Phase 4: Agents, Provenance & UI
 - [ ] **Step 16**: Clinical agents (`intake.py`, `specialist.py`, `pharmacy.py`) with `LLMClient` (mock/replay/live) executing the multi-agent interaction workflow (Intake -> Specialist -> Pharmacy as diagrammed in README).

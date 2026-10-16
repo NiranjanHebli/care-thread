@@ -276,3 +276,159 @@ class DeletionRequestNotFoundError(CareThreadError):
         details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message, code=code, details=details)
+
+
+class AuthenticationError(CareThreadError):
+    """Raised when authentication credentials are missing or invalid."""
+
+    def __init__(
+        self,
+        message: str = "Authentication required or credentials invalid",
+        code: str = "AUTH_REQUIRED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class RoleNotAllowedError(CareThreadError):
+    """Raised when caller role is not authorized for requested tool or action."""
+
+    def __init__(
+        self,
+        message: str = "Role not authorized for requested operation",
+        code: str = "ROLE_NOT_ALLOWED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class SessionClosedError(CareThreadError):
+    """Raised when an operation targets a session that is already closed."""
+
+    def __init__(
+        self,
+        message: str = "Session is already closed",
+        code: str = "SESSION_CLOSED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class MemoryIdNotFoundError(CareThreadError):
+    """Raised when one or more referenced memory IDs cannot be found."""
+
+    def __init__(
+        self,
+        message: str = "Referenced memory identifier not found",
+        code: str = "MEMORY_ID_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class RateLimitError(CareThreadError):
+    """Raised when request rate exceeds allowed throughput quotas."""
+
+    def __init__(
+        self,
+        message: str = "Request rate limit exceeded",
+        code: str = "RATE_LIMITED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class GraphUnavailableError(CareThreadError):
+    """Raised when graph database connectivity or transaction fails."""
+
+    def __init__(
+        self,
+        message: str = "Graph storage service is unavailable",
+        code: str = "GRAPH_UNAVAILABLE",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class EmbeddingUnavailableError(CareThreadError):
+    """Raised when embedding model or computation is unavailable."""
+
+    def __init__(
+        self,
+        message: str = "Embedding service is unavailable",
+        code: str = "EMBEDDING_UNAVAILABLE",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class HandoffIncompleteError(CareThreadError):
+    """Raised when handoff creation packet is missing required attributes."""
+
+    def __init__(
+        self,
+        message: str = "Handoff packet is incomplete",
+        code: str = "HANDOFF_INCOMPLETE",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class HandoffNotOpenError(CareThreadError):
+    """Raised when an operation expects a handoff to be in open status."""
+
+    def __init__(
+        self,
+        message: str = "Handoff is not in open status",
+        code: str = "HANDOFF_NOT_OPEN",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class HandoffExpiredError(CareThreadError):
+    """Raised when an operation targets an expired handoff."""
+
+    def __init__(
+        self,
+        message: str = "Handoff has expired past its TTL",
+        code: str = "HANDOFF_EXPIRED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class RetrievalExpiredError(CareThreadError):
+    """Raised when an answer commits against an expired or evicted retrieval."""
+
+    def __init__(
+        self,
+        message: str = "Retrieval context has expired",
+        code: str = "RETRIEVAL_EXPIRED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class ClaimUnsupportedError(CareThreadError):
+    """Raised when an answer contains claims lacking verifiable support."""
+
+    def __init__(
+        self,
+        message: str = "Answer claims lack supporting provenance citations",
+        code: str = "CLAIM_UNSUPPORTED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class AnswerNotFoundError(CareThreadError):
+    """Raised when a cited or queried answer node is not found."""
+
+    def __init__(
+        self,
+        message: str = "Answer not found",
+        code: str = "ANSWER_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
