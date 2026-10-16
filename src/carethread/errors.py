@@ -134,6 +134,30 @@ class FlagNotFoundError(CareThreadError):
         super().__init__(message, code=code, details=details)
 
 
+class HandoffNotFoundError(CareThreadError):
+    """Raised when a specified handoff packet does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Handoff not found",
+        code: str = "HANDOFF_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class HandoffStateError(CareThreadError):
+    """Raised when an invalid handoff state transition or CAS conflict occurs."""
+
+    def __init__(
+        self,
+        message: str = "Invalid handoff state transition",
+        code: str = "HANDOFF_STATE_ERROR",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
 class DatabaseError(CareThreadError):
     """Raised when graph database operation or verification fails."""
 

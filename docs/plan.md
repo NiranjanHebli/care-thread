@@ -19,7 +19,7 @@
 - [x] **Step 10**: Safety checks & contradiction detection (`memory/safety.py`): cross-reactivity flags, drug-drug conflicts.
 
 ## Phase 3: Coordination & MCP Interface
-- [ ] **Step 11**: Handoff state machine (`memory/handoff.py`): draft -> open -> accepted -> completed, CAS atomic accept for inter-agent delegation.
+- [x] **Step 11**: Handoff state machine (`memory/handoff.py`): draft -> open -> accepted -> completed, CAS atomic accept for inter-agent delegation.
 - [ ] **Step 12**: Audit logging engine (`memory/audit.py`): synchronous writes, batched read flushing.
 - [ ] **Step 13**: Procedural memory & background worker: consolidation runs, playbook promotions, decay marking.
 - [ ] **Step 14**: Deletion & retention (`forget_request`, cryptographically secure tombstones).

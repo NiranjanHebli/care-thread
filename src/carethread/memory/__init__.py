@@ -1,5 +1,3 @@
-"""CareThread memory layer package."""
-
 from carethread.memory.embeddings import (
     Embedder,
     FastEmbedder,
@@ -14,6 +12,10 @@ from carethread.memory.facts import (
     FactManager,
     FactRecord,
     compute_slot,
+)
+from carethread.memory.handoff import (
+    HandoffManager,
+    HandoffPacket,
 )
 from carethread.memory.recall import (
     NoteRecord,
@@ -44,6 +46,8 @@ __all__ = [
     "EpisodeRecord",
     "FactManager",
     "FactRecord",
+    "HandoffManager",
+    "HandoffPacket",
     "MessageRecord",
     "NoteRecord",
     "RecalledFact",
