@@ -45,3 +45,7 @@ assignment/
 *.jar
 data/synthea/
 
+# Test and coverage artifacts
+test-results/
+playwright-report/
+

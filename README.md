@@ -127,11 +127,13 @@ sequenceDiagram
 ## Setup and Installation
 
 ### Prerequisites
-- Docker & Docker Compose
-- Python 3.12+
-- [`uv`](https://docs.astral.sh/uv/) (recommended Python package installer)
+- **Docker & Docker Compose** (for FalkorDB graph database)
+- **Python 3.12+**
+- **Node.js 18+ & npm** (for the Cytoscape frontend console)
+- [`uv`](https://docs.astral.sh/uv/) (recommended package installer) or `venv`
 
-### 1. Clone & Setup Environment
+### Step 1: Environment Configuration
+Clone the repository and copy the sample environment file:
 ```bash
 git clone <repository-url>
 cd hackathon
@@ -140,47 +142,91 @@ cd hackathon
 cp .env.example .env
 ```
 
-### 2. Install Dependencies
-```bash
-uv venv
-source .venv/bin/activate
-uv sync
-```
-
-### 3. Launch FalkorDB
+### Step 2: Launch FalkorDB Graph Database
+Start the containerized FalkorDB instance with append-only persistence:
 ```bash
 make up
 make health
 ```
+FalkorDB listens on port `6379` (Redis protocol) with Web Browser access on port `3000`.
+
+### Step 3: Install Python Dependencies
+Set up the virtual environment and install dependencies:
+```bash
+# Using uv (recommended)
+uv venv
+source .venv/bin/activate
+uv sync
+
+# Or using standard pip
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### Step 4: Bootstrap Schema & Ingest Clinical Data
+Initialize schema constraints, vector indexes, and seed synthetic records:
+```bash
+# 1. Initialize schema range indexes, unique constraints, and 384-dim vector indexes
+make schema
+
+# 2. Seed shared clinic guidelines, formularies, and allergen interactions
+make seed-clinic
+
+# 3. Ingest synthetic patient history into isolated tenant graphs
+make ingest
+```
+
+### Step 5: Build and Run the Frontend (UI)
+The frontend is built with React, Vite, TypeScript, and Cytoscape.js in `ui/`:
+```bash
+# Install frontend dependencies
+cd ui && npm install
+
+# Build static production bundle served by FastAPI
+npm run build
+cd ..
+
+# Alternatively, run hot-reload dev server (http://localhost:3000):
+cd ui && npm run dev
+```
+
+### Step 6: Start the CareThread Application Server
+Launch the FastAPI REST, SSE streaming, and UI server:
+```bash
+# Start server on port 8080
+PYTHONPATH=src uv run uvicorn carethread.api.app:app --host 127.0.0.1 --port 8080
+```
+- **Web Console UI**: Visit [http://localhost:8080](http://localhost:8080) for the Cytoscape
+  graph explorer, Agent Console, and Handoff Board.
+- **Interactive API Docs**: Visit [http://localhost:8080/docs](http://localhost:8080/docs)
+  (OpenAPI / Swagger).
+- **Prometheus Metrics**: Visit [http://localhost:8080/metrics](http://localhost:8080/metrics).
 
 ---
 
-## Usage
-
-### Initialize Schema & Data
-```bash
-# 1. Initialize graph indexes and constraints
-make schema
-
-# 2. Ingest synthetic patient history and seed clinic rules
-make ingest
-make seed-clinic
-```
+## Usage & Development
 
 ### Synthetic Patient Data Generation (Synthea)
-CareThread relies on synthetic patient records generated via [Synthea](https://github.com/synthetichealth/synthea) (Apache 2.0).
+CareThread relies on synthetic patient records generated via
+[Synthea](https://github.com/synthetichealth/synthea) (Apache 2.0).
 
 #### 1. Instant Offline Test Fixture (Committed)
-A 10-patient synthetic dataset is pre-committed in `tests/fixtures/synthea_csv/`. It allows running unit tests (`pytest tests/unit/test_csv.py`) and fast local validation without any external dependencies or generation wait times.
+A 10-patient synthetic dataset is pre-committed in `tests/fixtures/synthea_csv/`. It allows running
+unit tests (`pytest tests/unit/test_csv.py`) and fast local validation without any external
+dependencies or generation wait times.
 
 #### 2. Full Cohort Generation Script (100+ Patients)
-For hackathon demonstrations, UI visualization, and load testing, run the automated generation script:
+For hackathon demonstrations, UI visualization, and load testing, run the automated generation
+script:
 ```bash
 # Generates 100 Massachusetts patients using seed 42 into data/synthea/csv/
 ./scripts/synthea_generate.sh 42 100 Massachusetts data/synthea/csv
 ```
-- **Automatic Fallback**: If host Java is missing, the script automatically executes Synthea via an `eclipse-temurin:17-jre` Docker container.
-- **Auto-Download**: If the generator jar is missing, the script fetches `synthea-with-dependencies.jar` from the official release.
+- **Automatic Fallback**: If host Java is missing, the script automatically executes Synthea via an
+  `eclipse-temurin:17-jre` Docker container.
+- **Auto-Download**: If the generator jar is missing, the script fetches
+  `synthea-with-dependencies.jar` from the official release.
 
 ### Data Ingestion Pipeline
 To ingest generated or custom Synthea CSV records into isolated FalkorDB graphs (`patient_<id>`):
@@ -191,10 +237,11 @@ make ingest
 # Or run the ingestion script directly with a custom directory
 uv run python scripts/ingest.py --data-dir data/synthea/csv
 ```
-- **PII Stripping (TR-ING-01)**: Column allowlists drop all sensitive identifiers (SSN, driver's license, passport, address) at read time before graph insertion.
-- **Medication Normalization (TR-ING-03)**: Automatically maps raw medication descriptions to active ingredients (`normalize_med()`) for bitemporal facts and safety checks.
-- **Count Invariant (TR-ING-05)**: Ingestion asserts that created FalkorDB nodes match source CSV rows.
-
+- **PII Stripping**: Column allowlists drop all sensitive identifiers (SSN, driver's license,
+  passport, address) at read time before graph insertion.
+- **Medication Normalization**: Automatically maps raw medication descriptions to active
+  ingredients (`normalize_med()`) for bitemporal facts and safety checks.
+- **Count Invariant**: Ingestion asserts that created FalkorDB nodes match source CSV rows.
 
 ### Run Tests
 ```bash
@@ -203,6 +250,9 @@ make test
 
 # Run tenant isolation test suite
 make test-iso
+
+# Run UI smoke tests via Playwright
+cd ui && npx playwright test
 ```
 
 ### Code Formatting & Linting

@@ -22,6 +22,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from carethread.agents.intake import IntakeAgent
 from carethread.agents.llm import LLMClient
@@ -579,6 +580,18 @@ def create_app(
             "advanced_seconds": req.seconds,
             "new_timestamp": effective_clock.now_ts(),
         }
+
+    # -------------------------------------------------------------------------
+    # Frontend Static Files Mount
+    # -------------------------------------------------------------------------
+    ui_dist_path = os.getenv(
+        "CT_UI_DIST",
+        os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "..", "ui", "dist")
+        ),
+    )
+    if os.path.exists(ui_dist_path):
+        app.mount("/", StaticFiles(directory=ui_dist_path, html=True), name="ui")
 
     return app
 

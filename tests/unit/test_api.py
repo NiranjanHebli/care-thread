@@ -392,3 +392,12 @@ def test_internal_harness_endpoints(api_fixture: dict[str, Any]) -> None:
     assert tool_res.status_code == 200
     assert tool_res.json()["ok"] is True
     assert tool_res.json()["data"]["session_id"].startswith("ses_")
+
+
+def test_ui_static_serving(api_fixture: dict[str, Any]) -> None:
+    """Verifies that the root path serves the compiled frontend static app."""
+    client: TestClient = api_fixture["client"]
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "text/html" in res.headers["content-type"]
+    assert "CareThread" in res.text
