@@ -20,7 +20,7 @@
 
 ## Phase 3: Coordination & MCP Interface
 - [x] **Step 11**: Handoff state machine (`memory/handoff.py`): draft -> open -> accepted -> completed, CAS atomic accept for inter-agent delegation.
-- [ ] **Step 12**: Audit logging engine (`memory/audit.py`): synchronous writes, batched read flushing.
+- [x] **Step 12**: Audit logging engine (`memory/audit.py`): synchronous writes, batched read flushing.
 - [ ] **Step 13**: Procedural memory & background worker: consolidation runs, playbook promotions, decay marking.
 - [ ] **Step 14**: Deletion & retention (`forget_request`, cryptographically secure tombstones).
 - [ ] **Step 15**: Unified tool dispatcher and FastMCP server (`src/carethread/mcp/`).

@@ -168,3 +168,27 @@ class DatabaseError(CareThreadError):
         details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message, code=code, details=details)
+
+
+class AuditError(CareThreadError):
+    """Raised when an audit logging operation fails."""
+
+    def __init__(
+        self,
+        message: str = "Audit logging operation failed",
+        code: str = "AUDIT_ERROR",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class AuditEventNotFoundError(CareThreadError):
+    """Raised when a requested audit event is not found."""
+
+    def __init__(
+        self,
+        message: str = "Audit event not found",
+        code: str = "AUDIT_EVENT_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
