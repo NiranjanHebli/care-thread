@@ -17,11 +17,11 @@ from typing import Any
 
 from carethread.clock import Clock, get_clock
 from carethread.db.client import get_db_client
+from carethread.db.clinic_reader import ClinicReader
 from carethread.db.tenant_router import TenantRouter
 from carethread.errors import (
     AnswerNotFoundError,
     CareThreadError,
-    ClaimUnsupportedError,
     HandoffIncompleteError,
     MemoryIdNotFoundError,
     RateLimitError,
@@ -43,17 +43,12 @@ from carethread.memory.recall import RecallManager
 from carethread.memory.safety import SafetyManager
 from carethread.memory.sessions import SessionManager
 from carethread.memory.worker import ConsolidationWorker
-from carethread.util.id import (
-    answer_id as gen_answer_id,
-)
+from carethread.provenance.engine import ProvenanceEngine
 from carethread.util.id import (
     request_id as gen_request_id,
 )
 from carethread.util.id import (
     retrieval_id as gen_retrieval_id,
-)
-from carethread.util.id import (
-    trace_id as gen_trace_id,
 )
 
 logger = logging.getLogger(__name__)
@@ -116,6 +111,12 @@ class ToolDispatcher:
         self._playbook_mgr = PlaybookManager(router=self._router, clock=self._clock)
         self._worker = ConsolidationWorker(router=self._router, clock=self._clock)
         self._forget_mgr = ForgettingManager(router=self._router, clock=self._clock)
+        self._clinic_reader = ClinicReader(self._client)
+        self._provenance_engine = ProvenanceEngine(
+            router=self._router,
+            clinic_reader=self._clinic_reader,
+            clock=self._clock,
+        )
 
         self._audit_logger = audit_logger or AuditLogger(router=self._router, clock=self._clock)
         self._audit_mgr = self._audit_logger
@@ -1029,81 +1030,40 @@ class ToolDispatcher:
         patient_id: str | None,
         audit_scope: Any,
     ) -> dict[str, Any]:
-        session_id = str(params.get("session_id", "")).strip()
-        ret_id = str(params.get("retrieval_id", "")).strip()
+        session_id = str(params.get("session_id", "")).strip() or None
+        ret_id = str(params.get("retrieval_id", "")).strip() or None
         question = str(params.get("question", "")).strip()
-        answer_text = str(params.get("answer_text", "")).strip()
+        answer_text = str(params.get("answer_text") or params.get("text", "")).strip()
         answer_type = str(params.get("answer_type", "informational")).strip()
         claims = params.get("claims") or []
         allow_unsupported = bool(params.get("allow_unsupported", False))
+        overall_confidence = params.get("overall_confidence")
+        clinician_review_required = params.get("clinician_review_required")
 
-        retrieval = self._retrievals.get(ret_id)
-        if not retrieval:
-            raise RetrievalExpiredError("Retrieval context has expired or was not found.")
+        retrieval = None
+        if ret_id:
+            retrieval = self._retrievals.get(ret_id)
+            if not retrieval:
+                raise RetrievalExpiredError("Retrieval context has expired or was not found.")
 
-        now_ts = self._clock.now_ts()
-        if now_ts - retrieval["created_at"] > RETRIEVAL_TTL_SECONDS:
-            raise RetrievalExpiredError("Retrieval context has expired past its 1-hour TTL.")
-
-        used_ids = {item["id"] for item in retrieval["items"]}
-        unsupported: list[dict[str, Any]] = []
-
-        for c in claims:
-            supported_by = c.get("supported_by", [])
-            valid_sup = [cid for cid in supported_by if cid in used_ids]
-            if not valid_sup and not allow_unsupported:
-                unsupported.append(c)
-
-        if unsupported:
-            raise ClaimUnsupportedError(
-                "One or more claims lack verified supporting provenance citations.",
-                details={"unsupported_claims": unsupported},
-            )
-
-        ans_id = gen_answer_id()
-        trc_id = gen_trace_id()
-
-        # Persist Answer in patient graph
-        target_graph = self._router.graph(patient_id or "")
-        create_ans_cypher = """
-        MATCH (p:Patient {id:$pid})
-        CREATE (a:Answer {
-            id: $aid,
-            question: $q,
-            answer_text: $txt,
-            answer_type: $atyp,
-            created_at: $now,
-            author_agent_id: $agent,
-            trace_id: $tid
-        })
-        CREATE (p)-[:HAS_ANSWER]->(a)
-        """
-        target_graph.query(
-            create_ans_cypher,
-            {
-                "pid": patient_id,
-                "aid": ans_id,
-                "q": question,
-                "txt": answer_text,
-                "atyp": answer_type,
-                "now": now_ts,
-                "agent": caller.agent_id,
-                "tid": trc_id,
-            },
+        trace = self._provenance_engine.commit_answer(
+            patient_id=patient_id or "",
+            question=question,
+            answer_text=answer_text,
+            session_id=session_id,
+            retrieval=retrieval,
+            claims=claims,
+            answer_type=answer_type,
+            overall_confidence=overall_confidence,
+            clinician_review_required=clinician_review_required,
+            author_agent_id=caller.agent_id,
+            allow_unsupported=allow_unsupported,
         )
 
-        trace = {
-            "trace_id": trc_id,
-            "answer_id": ans_id,
-            "patient_id": patient_id,
-            "session_id": session_id,
-            "question": question,
-            "answer_text": answer_text,
-            "claims": claims,
-            "used": retrieval["items"],
-            "rejected": retrieval["rejected"],
-        }
-        return {"answer_id": ans_id, "trace": trace}
+        if audit_scope and hasattr(audit_scope, "record_read_ids"):
+            audit_scope.record_read_ids([u["node_id"] for u in trace.used])
+
+        return {"answer_id": trace.answer_id, "trace": trace.to_dict()}
 
     def _tool_explain(
         self,
@@ -1114,32 +1074,31 @@ class ToolDispatcher:
     ) -> dict[str, Any]:
         ans_id = str(params.get("answer_id", "")).strip()
         why_not = params.get("why_not")
+        mode = str(params.get("mode", "trace"))
 
-        target_graph = self._router.graph(patient_id or "")
-        res = target_graph.query(
-            "MATCH (a:Answer {id:$aid}) RETURN a",
-            {"aid": ans_id},
+        exp_res = self._provenance_engine.explain_answer(
+            patient_id=patient_id or "",
+            answer_id=ans_id,
+            why_not=why_not,
+            mode=mode,
         )
-        if not res.result_set:
-            raise AnswerNotFoundError(f"Answer '{ans_id}' not found.")
 
-        props = dict(res.result_set[0][0].properties)
+        if audit_scope:
+            audit_scope.record_read_ids([u["node_id"] for u in exp_res.trace.used])
+
         if why_not:
-            return {
-                "answer_id": ans_id,
-                "why_not": why_not,
-                "reason_code": "OUT_OF_SCOPE",
-                "explanation": "Node was excluded from the active context.",
-            }
+            res = exp_res.why_not.to_dict() if exp_res.why_not else {}
+            res["answer_id"] = ans_id
+            res["why_not"] = why_not
+            return res
 
-        return {
-            "trace_id": props.get("trace_id", "trc_unknown"),
-            "answer_id": ans_id,
-            "question": props.get("question", ""),
-            "answer_text": props.get("answer_text", ""),
-            "used": [],
-            "rejected": [],
-        }
+        if mode == "ablate" and exp_res.ablated:
+            res = dict(exp_res.ablated)
+            res["answer_id"] = ans_id
+            res["trace_id"] = exp_res.trace.trace_id
+            return res
+
+        return exp_res.trace.to_dict()
 
     def _tool_list_flags(
         self,
