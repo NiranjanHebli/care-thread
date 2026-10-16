@@ -122,6 +122,18 @@ class NoteNotFoundError(CareThreadError):
         super().__init__(message, code=code, details=details)
 
 
+class FlagNotFoundError(CareThreadError):
+    """Raised when a specified safety flag does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Flag not found",
+        code: str = "FLAG_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
 class DatabaseError(CareThreadError):
     """Raised when graph database operation or verification fails."""
 

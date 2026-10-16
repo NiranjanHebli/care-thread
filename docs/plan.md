@@ -16,7 +16,7 @@
 - [x] **Step 08**: Semantic memory (`memory/facts.py`): bitemporal facts, CAS supersession, as-of point-in-time queries.
 
 - [x] **Step 09**: Hybrid recall (`memory/recall.py`): fastembed vector search + Cypher graph traversal, score ranking, rejected reason classification.
-- [ ] **Step 10**: Safety checks & contradiction detection (`memory/safety.py`): cross-reactivity flags, drug-drug conflicts.
+- [x] **Step 10**: Safety checks & contradiction detection (`memory/safety.py`): cross-reactivity flags, drug-drug conflicts.
 
 ## Phase 3: Coordination & MCP Interface
 - [ ] **Step 11**: Handoff state machine (`memory/handoff.py`): draft -> open -> accepted -> completed, CAS atomic accept for inter-agent delegation.

@@ -24,6 +24,11 @@ from carethread.memory.recall import (
     RecallResult,
     RejectedCandidate,
 )
+from carethread.memory.safety import (
+    SafetyCheckResult,
+    SafetyFlagRecord,
+    SafetyManager,
+)
 from carethread.memory.sessions import (
     MessageRecord,
     SessionManager,
@@ -47,6 +52,9 @@ __all__ = [
     "RecallManager",
     "RecallResult",
     "RejectedCandidate",
+    "SafetyCheckResult",
+    "SafetyFlagRecord",
+    "SafetyManager",
     "SessionManager",
     "SessionRecord",
     "compute_slot",
