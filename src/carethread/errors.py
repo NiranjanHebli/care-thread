@@ -110,6 +110,18 @@ class ConflictStaleVersionError(CareThreadError):
         super().__init__(message, code=code, details=details)
 
 
+class NoteNotFoundError(CareThreadError):
+    """Raised when a specified note does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Note not found",
+        code: str = "NOTE_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
 class DatabaseError(CareThreadError):
     """Raised when graph database operation or verification fails."""
 

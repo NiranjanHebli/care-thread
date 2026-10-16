@@ -15,6 +15,15 @@ from carethread.memory.facts import (
     FactRecord,
     compute_slot,
 )
+from carethread.memory.recall import (
+    NoteRecord,
+    RecalledFact,
+    RecalledGuideline,
+    RecalledNote,
+    RecallManager,
+    RecallResult,
+    RejectedCandidate,
+)
 from carethread.memory.sessions import (
     MessageRecord,
     SessionManager,
@@ -31,6 +40,13 @@ __all__ = [
     "FactManager",
     "FactRecord",
     "MessageRecord",
+    "NoteRecord",
+    "RecalledFact",
+    "RecalledGuideline",
+    "RecalledNote",
+    "RecallManager",
+    "RecallResult",
+    "RejectedCandidate",
     "SessionManager",
     "SessionRecord",
     "compute_slot",
