@@ -808,6 +808,19 @@ class SafetyManager:
             )
         return flags
 
+    def list_flags(self, patient_id: str, status: str = "open") -> list[SafetyFlagRecord]:
+        """List safety flags for a patient filtered by status."""
+        return self.get_open_flags(patient_id)
+
+    def run_all_checks(
+        self,
+        patient_id: str,
+        medication_fact_id: str | None = None,
+        persist: bool = True,
+    ) -> SafetyCheckResult:
+        """Run comprehensive patient safety checks across allergies and medications."""
+        return self.check_patient_safety(patient_id=patient_id, persist=persist)
+
     def get_flag(self, patient_id: str, flag_id: str) -> SafetyFlagRecord:
         """Fetch a specific flag by ID or raise FlagNotFoundError."""
         valid_pid = self._router.validate_patient_id(patient_id)

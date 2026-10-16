@@ -931,10 +931,11 @@ class ToolDispatcher:
         patient_id: str | None,
         audit_scope: Any,
     ) -> dict[str, Any]:
-        status = str(params.get("status", "open"))
+        status = params.get("status")
+        to_role = params.get("to_role") or params.get("role")
         handoffs = self._handoff_mgr.list_handoffs(
             patient_id=patient_id or "",
-            to_role=caller.role,
+            to_role=to_role,
             status=status,
         )
         return {"handoffs": [h.to_dict() for h in handoffs]}

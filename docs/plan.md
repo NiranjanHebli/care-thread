@@ -26,7 +26,7 @@
 - [x] **Step 15**: Unified tool dispatcher and FastMCP server (`src/carethread/mcp/`).
 
 ## Phase 4: Agents, Provenance & UI
-- [ ] **Step 16**: Clinical agents (`intake.py`, `specialist.py`, `pharmacy.py`) with `LLMClient` (mock/replay/live) executing the multi-agent interaction workflow (Intake -> Specialist -> Pharmacy as diagrammed in README).
+- [x] **Step 16**: Clinical agents (`intake.py`, `specialist.py`, `pharmacy.py`) with `LLMClient` (mock/replay/live) executing the multi-agent interaction workflow (Intake -> Specialist -> Pharmacy as diagrammed in README).
 - [ ] **Step 17**: Provenance engine (`commit_answer`, machine-verifiable traces, "Why Not?" analyzer).
 - [ ] **Step 18**: FastAPI REST & SSE endpoints.
 - [ ] **Step 19**: Cytoscape.js visual graph UI, trace highlighting, agent console, and handoff board.
