@@ -6,6 +6,9 @@ from carethread.util.id import (
     action_id,
     answer_id,
     audit_id,
+    candidate_id,
+    consolidation_id,
+    deletion_request_id,
     episode_id,
     fact_id,
     flag_id,
@@ -15,7 +18,10 @@ from carethread.util.id import (
     message_id,
     note_id,
     parse_ulid_timestamp,
+    playbook_id,
+    playbook_step_id,
     session_id,
+    tombstone_id,
     ulid_prefixed,
 )
 
@@ -54,6 +60,12 @@ def test_domain_helpers() -> None:
     assert is_valid_prefixed_ulid(flag_id(), "flg")
     assert is_valid_prefixed_ulid(answer_id(), "ans")
     assert is_valid_prefixed_ulid(audit_id(), "aud")
+    assert is_valid_prefixed_ulid(playbook_id(), "pb")
+    assert is_valid_prefixed_ulid(playbook_step_id(), "pbs")
+    assert is_valid_prefixed_ulid(candidate_id(), "can")
+    assert is_valid_prefixed_ulid(consolidation_id(), "cns")
+    assert is_valid_prefixed_ulid(deletion_request_id(), "del")
+    assert is_valid_prefixed_ulid(tombstone_id(), "tmb")
 
 
 def test_parse_ulid_timestamp() -> None:

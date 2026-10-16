@@ -123,3 +123,33 @@ def answer_id() -> str:
 def audit_id() -> str:
     """Generate a new AuditEvent identifier (aud_<ulid>)."""
     return ulid_prefixed("aud")
+
+
+def playbook_id() -> str:
+    """Generate a new Playbook identifier (pb_<ulid>)."""
+    return ulid_prefixed("pb")
+
+
+def playbook_step_id() -> str:
+    """Generate a new PlaybookStep identifier (pbs_<ulid>)."""
+    return ulid_prefixed("pbs")
+
+
+def candidate_id() -> str:
+    """Generate a new FactCandidate identifier (can_<ulid>)."""
+    return ulid_prefixed("can")
+
+
+def consolidation_id() -> str:
+    """Generate a new ConsolidationRun identifier (cns_<ulid>)."""
+    return ulid_prefixed("cns")
+
+
+def deletion_request_id() -> str:
+    """Generate a new DeletionRequest identifier (del_<ulid>)."""
+    return ulid_prefixed("del")
+
+
+def tombstone_id() -> str:
+    """Generate a new Tombstone identifier (tmb_<ulid>)."""
+    return ulid_prefixed("tmb")

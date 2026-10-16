@@ -133,3 +133,29 @@ class TenantRouter:
         query = "MATCH (p:Tenant {id: $pid}) DELETE p RETURN count(p) AS deleted"
         res = self._control_graph.query(query, {"pid": valid_pid})
         return bool(res.result_set and res.result_set[0][0] > 0)
+
+    def get_tenant_status(self, patient_id: str) -> str | None:
+        """Retrieves tenant status (e.g. 'active', 'deleting') from ct_control."""
+        valid_pid = self.validate_patient_id(patient_id)
+        query = "MATCH (p:Tenant {id: $pid}) RETURN p.status AS status"
+        res = self._control_graph.query(query, {"pid": valid_pid})
+        if res.result_set:
+            return str(res.result_set[0][0])
+        return None
+
+    def set_tenant_status(self, patient_id: str, status: str) -> bool:
+        """Updates status of a tenant in ct_control (e.g. 'active' -> 'deleting')."""
+        valid_pid = self.validate_patient_id(patient_id)
+        query = "MATCH (p:Tenant {id: $pid}) SET p.status = $status RETURN count(p) AS count"
+        res = self._control_graph.query(query, {"pid": valid_pid, "status": status})
+        return bool(res.result_set and res.result_set[0][0] > 0)
+
+    def is_deleting(self, patient_id: str) -> bool:
+        """Checks if a tenant is currently in 'deleting' state."""
+        return self.get_tenant_status(patient_id) == "deleting"
+
+    def list_deleting_tenants(self) -> list[str]:
+        """Lists all tenant IDs currently marked in 'deleting' status in ct_control."""
+        query = "MATCH (p:Tenant {status: 'deleting'}) RETURN p.id AS id ORDER BY p.id"
+        res = self._control_graph.query(query)
+        return [str(row[0]) for row in res.result_set]

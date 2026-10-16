@@ -19,6 +19,7 @@ from carethread.db.client import get_db_client
 from carethread.db.queries import get_query
 from carethread.db.tenant_router import TenantRouter
 from carethread.errors import (
+    ForgetNotAllowedError,
     PatientNotFoundError,
     SessionNotFoundError,
     ValidationError,
@@ -115,6 +116,12 @@ class SessionManager:
             PatientNotFoundError: If patient graph or node does not exist.
         """
         valid_pid = self._router.validate_patient_id(patient_id)
+        if self._router.is_deleting(valid_pid):
+            raise ForgetNotAllowedError(
+                f"Tenant '{valid_pid}' is currently being deleted; new sessions are blocked.",
+                details={"patient_id": valid_pid, "status": "deleting"},
+            )
+
         if channel not in VALID_CHANNELS:
             raise ValidationError(
                 f"Invalid channel '{channel}'. Allowed: {sorted(VALID_CHANNELS)}",

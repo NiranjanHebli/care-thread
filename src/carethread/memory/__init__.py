@@ -20,9 +20,22 @@ from carethread.memory.facts import (
     FactRecord,
     compute_slot,
 )
+from carethread.memory.forgetting import (
+    DeletionRequestRecord,
+    ForgettingManager,
+    TombstoneRecord,
+    compute_patient_hash,
+    generate_confirm_token,
+    hash_confirm_token,
+)
 from carethread.memory.handoff import (
     HandoffManager,
     HandoffPacket,
+)
+from carethread.memory.procedural import (
+    PlaybookManager,
+    PlaybookRecord,
+    PlaybookStepRecord,
 )
 from carethread.memory.recall import (
     NoteRecord,
@@ -43,35 +56,52 @@ from carethread.memory.sessions import (
     SessionManager,
     SessionRecord,
 )
+from carethread.memory.worker import (
+    ConsolidationRunRecord,
+    ConsolidationWorker,
+    FactCandidateRecord,
+)
 
 __all__ = [
     "AuditEventRecord",
     "AuditLogger",
     "AuditManager",
     "AuditScope",
+    "ConsolidationRunRecord",
+    "ConsolidationWorker",
+    "DeletionRequestRecord",
     "Embedder",
-    "FastEmbedder",
-    "HashEmbedder",
-    "get_embedder",
     "EpisodeManager",
     "EpisodeRecord",
+    "FactCandidateRecord",
     "FactManager",
     "FactRecord",
+    "FastEmbedder",
+    "ForgettingManager",
     "HandoffManager",
     "HandoffPacket",
+    "HashEmbedder",
     "MessageRecord",
     "NoteRecord",
+    "PlaybookManager",
+    "PlaybookRecord",
+    "PlaybookStepRecord",
+    "RecallManager",
+    "RecallResult",
     "RecalledFact",
     "RecalledGuideline",
     "RecalledNote",
-    "RecallManager",
-    "RecallResult",
     "RejectedCandidate",
     "SafetyCheckResult",
     "SafetyFlagRecord",
     "SafetyManager",
     "SessionManager",
     "SessionRecord",
+    "TombstoneRecord",
     "compute_args_hash",
+    "compute_patient_hash",
     "compute_slot",
+    "generate_confirm_token",
+    "get_embedder",
+    "hash_confirm_token",
 ]

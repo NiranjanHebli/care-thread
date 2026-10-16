@@ -192,3 +192,87 @@ class AuditEventNotFoundError(CareThreadError):
         details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message, code=code, details=details)
+
+
+class PlaybookNotFoundError(CareThreadError):
+    """Raised when a specified playbook does not exist."""
+
+    def __init__(
+        self,
+        message: str = "Playbook not found",
+        code: str = "PLAYBOOK_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class PlaybookStateError(CareThreadError):
+    """Raised when an invalid playbook state transition or operation occurs."""
+
+    def __init__(
+        self,
+        message: str = "Invalid playbook state transition",
+        code: str = "PLAYBOOK_STATE_ERROR",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class ConsolidationError(CareThreadError):
+    """Raised when a memory consolidation run fails."""
+
+    def __init__(
+        self,
+        message: str = "Memory consolidation operation failed",
+        code: str = "CONSOLIDATION_ERROR",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class ForgetNotAllowedError(CareThreadError):
+    """Raised when a forget or deletion request operation is not permitted."""
+
+    def __init__(
+        self,
+        message: str = "Forget request operation not permitted",
+        code: str = "FORGET_NOT_ALLOWED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class ForgetConfirmationRequiredError(CareThreadError):
+    """Raised when confirmation token is missing, invalid, or unverified."""
+
+    def __init__(
+        self,
+        message: str = "Confirmation required or invalid token provided",
+        code: str = "FORGET_CONFIRMATION_REQUIRED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class RequestExpiredError(CareThreadError):
+    """Raised when a deletion request has expired past its validity window."""
+
+    def __init__(
+        self,
+        message: str = "Request has expired",
+        code: str = "REQUEST_EXPIRED",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
+
+
+class DeletionRequestNotFoundError(CareThreadError):
+    """Raised when a specified deletion request cannot be found."""
+
+    def __init__(
+        self,
+        message: str = "Deletion request not found",
+        code: str = "DELETION_REQUEST_NOT_FOUND",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message, code=code, details=details)
