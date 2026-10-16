@@ -1134,9 +1134,8 @@ class ToolDispatcher:
         flag = self._safety_mgr.resolve_flag(
             patient_id=patient_id or "",
             flag_id=flag_id,
-            resolution=resolution,
-            note=note,
-            clinician_id=clinician_id,
+            resolved_by=clinician_id,
+            resolution_reason=note or resolution,
         )
         return {"flag": flag.to_dict()}
 

@@ -28,7 +28,7 @@
 ## Phase 4: Agents, Provenance & UI
 - [x] **Step 16**: Clinical agents (`intake.py`, `specialist.py`, `pharmacy.py`) with `LLMClient` (mock/replay/live) executing the multi-agent interaction workflow (Intake -> Specialist -> Pharmacy as diagrammed in README).
 - [x] **Step 17**: Provenance engine (`commit_answer`, machine-verifiable traces, "Why Not?" analyzer).
-- [ ] **Step 18**: FastAPI REST & SSE endpoints.
+- [x] **Step 18**: FastAPI REST & SSE endpoints.
 - [ ] **Step 19**: Cytoscape.js visual graph UI, trace highlighting, agent console, and handoff board.
 
 ## Phase 5: Verification & Benchmarking
