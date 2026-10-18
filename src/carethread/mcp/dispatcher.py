@@ -162,13 +162,13 @@ class ToolDispatcher:
         )
 
     def resolve_patient_from_fact(self, fact_id: str) -> str:
-        """Resolves patient ID bound to fact_id from graph search across tenants."""
+        """Resolves patient ID bound to fact_id or node_id from graph search across tenants."""
         tenants = self._router.list_tenants()
         for pid in tenants:
             try:
                 g = self._router.graph(pid)
                 res = g.query(
-                    "MATCH (f:Fact {id: $fid}) RETURN f.id",
+                    "MATCH (f {id: $fid}) RETURN f.id",
                     {"fid": fact_id},
                 )
                 if res.result_set:
@@ -224,10 +224,12 @@ class ToolDispatcher:
         for pid in tenants:
             try:
                 g = self._router.graph(pid)
-                res = g.query(
-                    "MATCH (f:SafetyConcern {id: $fid}) RETURN f.id",
-                    {"fid": flag_id},
+                cypher = (
+                    "MATCH (f {id: $fid}) "
+                    "WHERE 'Flag' IN labels(f) OR 'SafetyConcern' IN labels(f) "
+                    "RETURN f.id"
                 )
+                res = g.query(cypher, {"fid": flag_id})
                 if res.result_set:
                     return pid
             except Exception:
@@ -332,27 +334,114 @@ class ToolDispatcher:
                 details=err.details,
             )
 
-        # 4. Resolve tenant identifier
+        # 4. Resolve tenant identifier and detect cross-tenant mismatches
         target_pid: str | None = None
         try:
+            specified_pid: str | None = None
             if "patient_id" in params and params["patient_id"]:
                 raw_pid = str(params["patient_id"]).strip()
-                target_pid = self._router.validate_patient_id(raw_pid)
-            elif "session_id" in params and params["session_id"]:
-                target_pid = self.resolve_patient_from_session(str(params["session_id"]).strip())
-            elif "fact_id" in params and params["fact_id"]:
-                target_pid = self.resolve_patient_from_fact(str(params["fact_id"]).strip())
-            elif "handoff_id" in params and params["handoff_id"]:
-                target_pid = self.resolve_patient_from_handoff(str(params["handoff_id"]).strip())
-            elif "answer_id" in params and params["answer_id"]:
-                target_pid = self.resolve_patient_from_answer(str(params["answer_id"]).strip())
-            elif "flag_id" in params and params["flag_id"]:
-                target_pid = self.resolve_patient_from_flag(str(params["flag_id"]).strip())
-            elif "playbook_id" in params and params["playbook_id"]:
-                target_pid = self.resolve_patient_from_playbook(str(params["playbook_id"]).strip())
-            elif isinstance(caller.patient_scope, list) and len(caller.patient_scope) == 1:
+                specified_pid = self._router.validate_patient_id(raw_pid)
+
+            session_pid: str | None = None
+            if "session_id" in params and params["session_id"]:
+                session_pid = self.resolve_patient_from_session(str(params["session_id"]).strip())
+
+            # Detect conflict between session tenant and explicit patient_id
+            if specified_pid and session_pid and specified_pid != session_pid:
+                raise TenantMismatchError(
+                    f"Session '{params['session_id']}' is bound to patient '{session_pid}', "
+                    f"which does not match requested patient '{specified_pid}'.",
+                    details={
+                        "session_id": params["session_id"],
+                        "session_patient": session_pid,
+                        "target_patient": specified_pid,
+                    },
+                )
+
+            target_pid = specified_pid or session_pid
+
+            # Check if referenced fact belongs to another tenant
+            if "fact_id" in params and params["fact_id"]:
+                fact_pid = self.resolve_patient_from_fact(str(params["fact_id"]).strip())
+                if target_pid and target_pid != fact_pid:
+                    raise TenantMismatchError(
+                        f"Fact '{params['fact_id']}' belongs to patient '{fact_pid}', "
+                        f"which does not match target patient '{target_pid}'.",
+                        details={
+                            "fact_id": params["fact_id"],
+                            "fact_patient": fact_pid,
+                            "target_patient": target_pid,
+                        },
+                    )
+                target_pid = target_pid or fact_pid
+
+            # Check if referenced answer belongs to another tenant
+            if "answer_id" in params and params["answer_id"]:
+                answer_pid = self.resolve_patient_from_answer(str(params["answer_id"]).strip())
+                if target_pid and target_pid != answer_pid:
+                    raise TenantMismatchError(
+                        f"Answer '{params['answer_id']}' belongs to patient '{answer_pid}', "
+                        f"which does not match target patient '{target_pid}'.",
+                        details={
+                            "answer_id": params["answer_id"],
+                            "answer_patient": answer_pid,
+                            "target_patient": target_pid,
+                        },
+                    )
+                target_pid = target_pid or answer_pid
+
+            # Check if referenced handoff belongs to another tenant
+            if "handoff_id" in params and params["handoff_id"]:
+                handoff_pid = self.resolve_patient_from_handoff(str(params["handoff_id"]).strip())
+                if target_pid and target_pid != handoff_pid:
+                    raise TenantMismatchError(
+                        f"Handoff '{params['handoff_id']}' belongs to patient '{handoff_pid}', "
+                        f"which does not match target patient '{target_pid}'.",
+                    )
+                target_pid = target_pid or handoff_pid
+
+            # Check if referenced flag belongs to another tenant
+            if "flag_id" in params and params["flag_id"]:
+                flag_pid = self.resolve_patient_from_flag(str(params["flag_id"]).strip())
+                if target_pid and target_pid != flag_pid:
+                    raise TenantMismatchError(
+                        f"Flag '{params['flag_id']}' belongs to patient '{flag_pid}', "
+                        f"which does not match target patient '{target_pid}'.",
+                    )
+                target_pid = target_pid or flag_pid
+
+            # Check if referenced playbook belongs to another tenant
+            if "playbook_id" in params and params["playbook_id"]:
+                pbid = str(params["playbook_id"]).strip()
+                playbook_pid = self.resolve_patient_from_playbook(pbid)
+                if target_pid and target_pid != playbook_pid:
+                    raise TenantMismatchError(
+                        f"Playbook '{params['playbook_id']}' belongs to patient '{playbook_pid}', "
+                        f"which does not match target patient '{target_pid}'.",
+                    )
+                target_pid = target_pid or playbook_pid
+
+            if (
+                not target_pid
+                and isinstance(caller.patient_scope, list)
+                and len(caller.patient_scope) == 1
+            ):
                 target_pid = caller.patient_scope[0]
+
         except CareThreadError as err:
+            if isinstance(err, (TenantMismatchError, MemoryIdNotFoundError)):
+                try:
+                    self._audit_logger.log_event(
+                        patient_id=None,
+                        agent_id=caller.agent_id,
+                        role=caller.role,
+                        tool=tool_name,
+                        op="denied",
+                        outcome="denied",
+                        args=params,
+                    )
+                except Exception as log_err:
+                    logger.debug(f"Audit log fallback error: {log_err}")
             return error_envelope(
                 code=err.code,
                 message=err.message,

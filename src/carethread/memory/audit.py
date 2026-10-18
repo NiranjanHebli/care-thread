@@ -286,7 +286,7 @@ class AuditLogger:
 
     def log_denied(
         self,
-        patient_id: str,
+        patient_id: str | None,
         agent_id: str,
         role: str,
         tool: str,
@@ -299,13 +299,52 @@ class AuditLogger:
         latency_ms: float = 0.0,
     ) -> AuditEventRecord:
         """Synchronously records an access denied or policy violation event."""
-        valid_pid = self._validate_common(patient_id, role, tool, "denied")
-        self._ensure_patient_exists(valid_pid)
-
         now_ts = int(self._clock.now().timestamp())
         eid = gen_audit_id()
         final_hash = args_hash or compute_args_hash(args)
         final_read_ids = list(read_ids) if read_ids else []
+
+        if not patient_id:
+            # Cross-tenant denied event logged to ct_control to prevent tenant cross-contamination
+            ctrl_graph = self._router._control_graph
+            cypher = """
+            CREATE (a:AuditEvent {
+                id: $eid, ts: $now, agent_id: $agent_id, role: $role,
+                tool: $tool, op: 'denied', outcome: $outcome,
+                args_hash: $args_hash, latency_ms: $latency_ms
+            })
+            RETURN a.id
+            """
+            ctrl_graph.query(
+                cypher,
+                {
+                    "eid": eid,
+                    "now": now_ts,
+                    "agent_id": agent_id.strip(),
+                    "role": role.strip().lower(),
+                    "tool": tool.strip(),
+                    "outcome": outcome.strip(),
+                    "args_hash": final_hash,
+                    "latency_ms": float(latency_ms),
+                },
+            )
+            return AuditEventRecord(
+                id=eid,
+                patient_id="ct_control",
+                ts=now_ts,
+                agent_id=agent_id.strip(),
+                role=role.strip().lower(),
+                tool=tool.strip(),
+                op="denied",
+                outcome=outcome.strip(),
+                args_hash=final_hash,
+                read_ids=final_read_ids,
+                trace_id=(trace_id or "").strip() or None,
+                latency_ms=float(latency_ms),
+            )
+
+        valid_pid = self._validate_common(patient_id, role, tool, "denied")
+        self._ensure_patient_exists(valid_pid)
 
         q_aud_01 = get_query("q_aud_01")
         target_graph = self._router.graph(valid_pid)
@@ -392,7 +431,7 @@ class AuditLogger:
 
     def log_event(
         self,
-        patient_id: str,
+        patient_id: str | None,
         agent_id: str,
         role: str,
         tool: str,

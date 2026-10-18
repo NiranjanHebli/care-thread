@@ -32,6 +32,6 @@
 - [x] **Step 19**: Cytoscape.js visual graph UI, trace highlighting, agent console, and handoff board.
 
 ## Phase 5: Verification & Benchmarking
-- [ ] **Step 20**: Isolation test suite (`tests/isolation/test_iso_*.py`).
+- [x] **Step 20**: Isolation test suite (`tests/isolation/test_iso_*.py`).
 - [ ] **Step 21**: Load & concurrency test harness (`loadtest/`).
 - [ ] **Step 22**: 3-Way Benchmark report (Stateless vs Vector-only vs CareThread Graph Memory).

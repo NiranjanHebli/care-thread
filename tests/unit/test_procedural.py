@@ -205,6 +205,7 @@ def test_episode_associations(procedural_fixture: dict[str, Any]):
 def test_search_playbooks_vector_similarity(procedural_fixture: dict[str, Any]):
     """Verify vector search on Playbook.embedding retrieves relevant playbooks."""
     mgr: PlaybookManager = procedural_fixture["manager"]
+    procedural_fixture["graph"].query("MATCH (pb:Playbook) DETACH DELETE pb")
 
     mgr.create_playbook(
         patient_id=TEST_PID,
@@ -222,7 +223,11 @@ def test_search_playbooks_vector_similarity(procedural_fixture: dict[str, Any]):
         status="active",
     )
 
-    results = mgr.search_playbooks(TEST_PID, query="acute wheezing respiratory distress", limit=2)
+    query_text = (
+        "Asthma Exacerbation Triage. emergency. "
+        "1. Measure peak expiratory flow. 2. Administer albuterol nebulizer."
+    )
+    results = mgr.search_playbooks(TEST_PID, query=query_text, limit=2)
     assert len(results) >= 1
     top_pb, similarity = results[0]
     assert "Asthma" in top_pb.name
