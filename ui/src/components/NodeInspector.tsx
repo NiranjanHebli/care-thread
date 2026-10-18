@@ -37,17 +37,23 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
     );
   }
 
-  // Filter out embedding vectors and internal cy properties per clinical requirements
+  // Filter out internal cy properties, embeddings, and already-featured keys
+  const featuredKeys = new Set(['id', 'type', 'label', 'display', 'summary']);
   const filteredProperties = Object.entries(nodeData).filter(([key]) => {
     const k = key.toLowerCase();
-    return !k.includes('embedding') && !k.includes('vector') && k !== 'label';
+    return (
+      !featuredKeys.has(key) &&
+      !k.includes('embedding') &&
+      !k.includes('vector') &&
+      k !== 'label'
+    );
   });
 
   return (
     <div className="glass-card" id="node-inspector" style={{ marginTop: '12px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h4 style={{ fontSize: '13px', color: 'var(--accent-cyan)' }}>
-          Node Inspector: {nodeData.type || 'Node'}
+          {String(nodeData.display || nodeData.type || 'Node Inspector')}
         </h4>
         <button
           className="btn btn-secondary"
@@ -58,6 +64,23 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
           X
         </button>
       </div>
+
+      {Boolean(nodeData.summary) && (
+        <div
+          style={{
+            marginTop: '8px',
+            background: 'rgba(13, 148, 136, 0.15)',
+            borderLeft: '3px solid var(--accent-cyan)',
+            padding: '6px 8px',
+            borderRadius: '4px',
+            fontSize: '11px',
+            color: '#e2e8f0',
+            lineHeight: 1.4,
+          }}
+        >
+          {String(nodeData.summary)}
+        </div>
+      )}
 
       <div
         style={{
@@ -88,7 +111,9 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
               paddingTop: '4px',
             }}
           >
-            <span style={{ color: 'var(--text-secondary)' }}>{k}:</span>
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {k.replace(/_/g, ' ')}:
+            </span>
             <span style={{ textAlign: 'right', wordBreak: 'break-all', maxWidth: '240px' }}>
               {typeof v === 'object' ? JSON.stringify(v) : String(v)}
             </span>

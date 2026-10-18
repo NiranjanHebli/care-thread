@@ -216,11 +216,12 @@ def create_app(
         edges: list[dict[str, Any]] = []
         seen_node_ids: set[str] = set()
 
-        # Query main nodes excluding observations if collapsed
+        # Query main nodes excluding observations if collapsed and audit events
         label_filter = (
-            "WHERE NOT 'Observation' IN labels(n) AND NOT 'ClinicalProcedure' IN labels(n)"
+            "WHERE NOT 'Observation' IN labels(n) AND NOT 'ClinicalProcedure' IN labels(n) "
+            "AND NOT 'AuditEvent' IN labels(n)"
             if collapse_observations
-            else ""
+            else "WHERE NOT 'AuditEvent' IN labels(n)"
         )
         node_query = f"MATCH (n) {label_filter} RETURN n.id, labels(n)[0], properties(n)"
         n_res = g.query(node_query)
@@ -232,19 +233,60 @@ def create_app(
             seen_node_ids.add(nid)
             label = str(row[1] or "Node")
             props = dict(row[2] or {})
+            clean_props = {k: v for k, v in props.items() if not k.endswith("embedding")}
 
-            display = props.get("display") or props.get("name") or props.get("text") or nid
+            display = (
+                clean_props.get("display")
+                or clean_props.get("name")
+                or clean_props.get("text")
+                or clean_props.get("description")
+                or clean_props.get("question")
+            )
+            if not display or display == nid:
+                if label == "Agent" or nid.startswith("agt_"):
+                    if "intake" in nid:
+                        display = "Intake Agent"
+                    elif "specialist" in nid:
+                        display = "Specialist Agent"
+                    elif "pharmacy" in nid:
+                        display = "Pharmacy Agent"
+                    else:
+                        display = "Clinical Agent"
+                elif label == "Episode" or nid.startswith("epi_"):
+                    seq = clean_props.get("seq")
+                    ep_type = (clean_props.get("episode_type") or "visit").capitalize()
+                    display = f"Visit {seq} ({ep_type})" if seq else f"{ep_type} Visit"
+                elif label == "Handoff" or nid.startswith("hnd_"):
+                    to_role = clean_props.get("to_role") or "agent"
+                    display = f"Handoff to {to_role.replace('_', ' ').capitalize()}"
+                elif label == "Session" or nid.startswith("ses_"):
+                    display = "Clinical Session"
+                elif label == "Action" or nid.startswith("act_"):
+                    desc = clean_props.get("description") or "Clinical Action"
+                    display = desc[:35] + "..." if len(desc) > 38 else desc
+                elif label == "OpenQuestion" or nid.startswith("qst_"):
+                    q = clean_props.get("question") or "Open Question"
+                    display = q[:35] + "..." if len(q) > 38 else q
+                elif label == "Message" or nid.startswith("msg_"):
+                    role = clean_props.get("role") or "User"
+                    display = f"{role.capitalize()} Message"
+                elif label == "Flag" or nid.startswith("flg_"):
+                    display = clean_props.get("category") or "Safety Flag"
+                else:
+                    display = nid
+
             if isinstance(display, str) and len(display) > 80:
                 display = display[:77] + "..."
 
             node_data: dict[str, Any] = {
+                **clean_props,
                 "id": nid,
                 "label": label,
                 "display": display,
-                "status": props.get("status", "active"),
-                "confidence": props.get("confidence"),
-                "role": props.get("role"),
-                "created_at": props.get("created_at"),
+                "status": clean_props.get("status", "active"),
+                "confidence": clean_props.get("confidence"),
+                "role": clean_props.get("role"),
+                "created_at": clean_props.get("created_at"),
             }
             nodes.append({"data": node_data})
 

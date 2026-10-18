@@ -13,6 +13,141 @@ interface GraphCanvasProps {
   onNodeSelect: (nodeData: CytoscapeNodeData | null) => void;
 }
 
+/**
+ * Maps raw Cypher relationship types to human-readable clinical labels.
+ */
+const formatEdgeLabel = (relType: string): string => {
+  const edgeLabelMap: Record<string, string> = {
+    HAS_FACT: 'has',
+    ASSERTED_IN: 'documented in',
+    HAS_EPISODE: 'visit',
+    WITH_PROVIDER: 'treated by',
+    AT_ORG: 'facility',
+    NEXT: 'followed by',
+    PRODUCED: 'observed',
+    PERFORMED: 'procedure',
+    HAS_SESSION: 'session',
+    HAS_MESSAGE: 'message',
+    USED: 'cited in answer',
+    REJECTED: 'contraindicated',
+    FLAGGED: 'safety flag',
+    HANDOFF_TO: 'handoff to',
+    SUPERSEDES: 'supersedes',
+    DERIVED_FROM: 'derived from',
+    CONTRADICTS: 'contradicts',
+    FROM: 'from agent',
+    TO: 'to agent',
+    CARRIES: 'carries order',
+    HAS_QUESTION: 'question',
+    HAS_ACTION: 'action',
+    HAS_NOTE: 'note',
+    HAS_HANDOFF: 'handoff',
+    ACCEPTED_IN: 'accepted in',
+    CREATED_IN: 'created in',
+  };
+  return edgeLabelMap[relType] || relType.toLowerCase().replace(/_/g, ' ');
+};
+
+/**
+ * Maps raw node identifiers and technical IDs into friendly clinical titles.
+ */
+const formatNodeDisplay = (data: Record<string, any>): string => {
+  const nodeType = data.type || data.label || 'Node';
+  const rawId = typeof data.id === 'string' ? data.id : '';
+
+  // 1. Format Agent participants: agt_intake_01 -> "Intake Agent"
+  if (nodeType === 'Agent' || rawId.startsWith('agt_')) {
+    if (rawId.includes('intake') || data.role === 'intake') return 'Intake Agent';
+    if (rawId.includes('specialist') || data.role === 'specialist') return 'Specialist Agent';
+    if (rawId.includes('pharmacy') || data.role === 'pharmacy') return 'Pharmacy Agent';
+    if (rawId.includes('triage') || data.role === 'triage') return 'Triage Agent';
+    const roleMatch = rawId.match(/^agt_([a-zA-Z]+)/);
+    if (roleMatch) {
+      const r = roleMatch[1];
+      return `${r.charAt(0).toUpperCase() + r.slice(1)} Agent`;
+    }
+    return 'Clinical Agent';
+  }
+
+  // 2. Format clinical episodes / encounters: epi_enc-01 -> "Visit 1 (Ambulatory)"
+  if (nodeType === 'Episode' || rawId.startsWith('epi_')) {
+    const seq = data.seq || rawId.match(/enc-0?(\d+)/)?.[1] || '';
+    const rawType = data.episode_type || '';
+    const epType = rawType ? rawType.charAt(0).toUpperCase() + rawType.slice(1) : '';
+    if (seq && epType) {
+      return `Visit ${seq} (${epType})`;
+    }
+    if (seq) {
+      return `Visit ${seq}`;
+    }
+    if (epType) {
+      return `${epType} Visit`;
+    }
+    return 'Clinic Visit';
+  }
+
+  // 3. Format handoffs
+  if (nodeType === 'Handoff' || rawId.startsWith('hnd_')) {
+    const role = data.to_role ? String(data.to_role).replace(/_/g, ' ') : '';
+    return role ? `Handoff to ${role}` : 'Handoff';
+  }
+
+  // 4. Format Action nodes: act_... -> Action description
+  if (nodeType === 'Action' || rawId.startsWith('act_')) {
+    const desc = data.description || data.text || data.action || '';
+    if (typeof desc === 'string' && desc.trim()) {
+      return desc.length > 35 ? `${desc.slice(0, 32)}...` : desc;
+    }
+    return 'Action Item';
+  }
+
+  // 5. Format OpenQuestion nodes: qst_... -> Question text
+  if (nodeType === 'OpenQuestion' || rawId.startsWith('qst_')) {
+    const q = data.question || data.text || '';
+    if (typeof q === 'string' && q.trim()) {
+      return q.length > 35 ? `${q.slice(0, 32)}...` : q;
+    }
+    return 'Clinical Question';
+  }
+
+  // 6. Format Session nodes: ses_... -> "Clinical Session"
+  if (nodeType === 'Session' || rawId.startsWith('ses_')) {
+    return 'Clinical Session';
+  }
+
+  // 7. Format Message nodes: msg_... -> Message snippet
+  if (nodeType === 'Message' || rawId.startsWith('msg_')) {
+    const content = data.content || '';
+    if (typeof content === 'string' && content.trim()) {
+      return content.length > 30 ? `${content.slice(0, 27)}...` : content;
+    }
+    const role = data.role ? String(data.role).replace(/_/g, ' ') : '';
+    return role ? `${role.charAt(0).toUpperCase() + role.slice(1)} Message` : 'Message';
+  }
+
+  // 8. Format Flags: flg_... -> Safety Flag
+  if (nodeType === 'Flag' || rawId.startsWith('flg_')) {
+    return data.category || 'Safety Flag';
+  }
+
+  // 9. Format Notes: not_... -> Clinical Note
+  if (nodeType === 'Note' || rawId.startsWith('not_')) {
+    const title = data.title || data.subject;
+    return typeof title === 'string' && title ? title : 'Clinical Note';
+  }
+
+  const currentDisplay = data.display || data.name || data.text;
+  if (typeof currentDisplay === 'string') {
+    const epMatch = currentDisplay.match(/^epi_enc-0?(\d+)$/);
+    if (epMatch) {
+      return `Visit ${epMatch[1]}`;
+    }
+    return currentDisplay;
+  }
+
+  return rawId || 'Node';
+};
+
 export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   graphData,
   selectedAnswerTrace,
@@ -40,10 +175,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             'background-color': '#334155',
             'border-width': '2px',
             'border-color': '#64748b',
-            width: '44px',
-            height: '44px',
+            width: '46px',
+            height: '46px',
             'text-max-width': '95px',
-            'text-wrap': 'ellipsis',
+            'text-wrap': 'wrap',
             'transition-property': 'background-color, border-color, opacity',
             'transition-duration': 0.2,
           },
@@ -76,8 +211,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             'background-color': '#0d9488',
             'border-color': '#2dd4bf',
             shape: 'round-rectangle',
-            width: '48px',
-            height: '48px',
+            width: '58px',
+            height: '58px',
+            'font-size': '10px',
+            'font-weight': 'bold',
           },
         },
         {
@@ -152,6 +289,62 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           },
         },
         {
+          selector: 'node[type = "Agent"]',
+          style: {
+            'background-color': '#4338ca',
+            'border-color': '#818cf8',
+            shape: 'round-rectangle',
+            width: '56px',
+            height: '56px',
+            'font-size': '10px',
+            'font-weight': 'bold',
+          },
+        },
+        {
+          selector: 'node[type = "Action"]',
+          style: {
+            'background-color': '#0e7490',
+            'border-color': '#38bdf8',
+            shape: 'round-rectangle',
+            width: '48px',
+            height: '48px',
+            'font-size': '9px',
+          },
+        },
+        {
+          selector: 'node[type = "OpenQuestion"]',
+          style: {
+            'background-color': '#b45309',
+            'border-color': '#fbbf24',
+            shape: 'round-rectangle',
+            width: '48px',
+            height: '48px',
+            'font-size': '9px',
+          },
+        },
+        {
+          selector: 'node[type = "Message"]',
+          style: {
+            'background-color': '#334155',
+            'border-color': '#94a3b8',
+            shape: 'round-rectangle',
+            width: '44px',
+            height: '44px',
+            'font-size': '9px',
+          },
+        },
+        {
+          selector: 'node[type = "Note"]',
+          style: {
+            'background-color': '#047857',
+            'border-color': '#34d399',
+            shape: 'round-rectangle',
+            width: '48px',
+            height: '48px',
+            'font-size': '9px',
+          },
+        },
+        {
           selector: 'node[?is_clinic]',
           style: {
             'background-color': '#d97706',
@@ -171,10 +364,11 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             'curve-style': 'bezier',
             label: 'data(label)',
             'font-size': '9px',
-            color: '#94a3b8',
-            'text-background-opacity': 0.85,
+            color: '#cbd5e1',
+            'text-rotation': 'autorotate',
+            'text-background-opacity': 0.88,
             'text-background-color': '#0a0e17',
-            'text-background-padding': '2px',
+            'text-background-padding': '3px',
             'text-background-shape': 'roundrectangle',
           },
         },
@@ -254,7 +448,9 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     if (!cy || !graphData) return;
 
     cy.elements().remove();
-    const rawNodes = graphData.elements.nodes || [];
+    const rawNodes = (graphData.elements.nodes || []).filter(
+      (n) => n.data.label !== 'AuditEvent' && n.data.type !== 'AuditEvent'
+    );
     const rawEdges = graphData.elements.edges || [];
 
     // Normalize node data for display and label matching
@@ -267,12 +463,25 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           ...d,
           type: nodeType,
           label: nodeType,
-          display: d.display || d.name || d.id,
+          display: formatNodeDisplay({ ...d, type: nodeType, label: nodeType }),
         },
       };
     });
 
-    cy.add([...nodes, ...rawEdges]);
+    const edges = rawEdges.map((e) => {
+      const d = { ...e.data };
+      const rawRel = String(d.label || d.rel_type || 'RELATED');
+      return {
+        ...e,
+        data: {
+          ...d,
+          rel_type: rawRel,
+          label: formatEdgeLabel(rawRel),
+        },
+      };
+    });
+
+    cy.add([...nodes, ...edges]);
 
     const layout = cy.layout({
       name: 'cose',
