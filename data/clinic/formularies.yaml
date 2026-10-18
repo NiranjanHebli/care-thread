@@ -1,0 +1,242 @@
+# Clinical Drug Formularies and Classes
+# Defines drug classes, formulary tiers, and drug-drug interactions.
+
+drug_classes:
+  - id: "dc_penicillins"
+    name: "Penicillin Antibiotics"
+    description: "Beta-lactam antibiotics effective against gram-positive and selected gram-negative bacteria."
+
+  - id: "dc_cephalosporins"
+    name: "Cephalosporin Antibiotics"
+    description: "Beta-lactam antibiotics structurally related to penicillins with 1st through 4th generation coverage."
+
+  - id: "dc_carbapenems"
+    name: "Carbapenem Antibiotics"
+    description: "Broad-spectrum beta-lactams with high resistance to beta-lactamases."
+
+  - id: "dc_nsaids"
+    name: "Non-Steroidal Anti-Inflammatory Drugs"
+    description: "Analgesic, antipyretic, and anti-inflammatory agents acting via cyclooxygenase inhibition."
+
+  - id: "dc_ace_inhibitors"
+    name: "Angiotensin Converting Enzyme Inhibitors"
+    description: "Antihypertensive agents blocking conversion of angiotensin I to angiotensin II."
+
+  - id: "dc_arbs"
+    name: "Angiotensin Receptor Blockers"
+    description: "Antihypertensive agents selectively blocking the AT1 subtype of angiotensin II receptor."
+
+  - id: "dc_statins"
+    name: "HMG-CoA Reductase Inhibitors"
+    description: "Lipid-lowering medications reducing LDL cholesterol and cardiovascular risk."
+
+  - id: "dc_biguanides"
+    name: "Biguanide Antidiabetics"
+    description: "Oral antidiabetic agents reducing hepatic glucose production and improving insulin sensitivity."
+
+  - id: "dc_thiazides"
+    name: "Thiazide Diuretics"
+    description: "Diuretics inhibiting sodium reabsorption in the distal convoluted tubule."
+
+  - id: "dc_calcium_channel_blockers"
+    name: "Calcium Channel Blockers"
+    description: "Dihydropyridine and non-dihydropyridine vasodilators for hypertension and angina."
+
+  - id: "dc_sulfonamides"
+    name: "Sulfonamide Antibacterials"
+    description: "Bacteriostatic folate synthesis inhibitors."
+
+  - id: "dc_opioids"
+    name: "Opioid Analgesics"
+    description: "Mu-opioid receptor agonists for acute and severe pain."
+
+drugs:
+  # Penicillins
+  - code: "834102"
+    name: "Penicillin V Potassium 500 MG Oral Tablet"
+    ingredient: "Penicillin V Potassium"
+    class_id: "dc_penicillins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "834061"
+    name: "Penicillin V Potassium 250 MG Oral Tablet"
+    ingredient: "Penicillin V Potassium"
+    class_id: "dc_penicillins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "308182"
+    name: "Amoxicillin 250 MG Oral Capsule"
+    ingredient: "Amoxicillin"
+    class_id: "dc_penicillins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "308192"
+    name: "Amoxicillin 500 MG Oral Tablet"
+    ingredient: "Amoxicillin"
+    class_id: "dc_penicillins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "617296"
+    name: "amoxicillin 500 MG / clavulanate 125 MG Oral Tablet"
+    ingredient: "Amoxicillin and Clavulanate Potassium"
+    class_id: "dc_penicillins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Cephalosporins
+  - code: "1665060"
+    name: "cefazolin 2000 MG Injection"
+    ingredient: "Cefazolin Sodium"
+    class_id: "dc_cephalosporins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "197454"
+    name: "cephalexin 500 MG Oral Tablet"
+    ingredient: "Cephalexin Monohydrate"
+    class_id: "dc_cephalosporins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "309097"
+    name: "Cefuroxime 250 MG Oral Tablet"
+    ingredient: "Cefuroxime Axetil"
+    class_id: "dc_cephalosporins"
+    formulary_tier: 2
+    formulary_status: "preferred"
+
+  - code: "1665011"
+    name: "Ceftriaxone 1000 MG Injection"
+    ingredient: "Ceftriaxone Sodium"
+    class_id: "dc_cephalosporins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # NSAIDs
+  - code: "310965"
+    name: "Ibuprofen 200 MG Oral Tablet"
+    ingredient: "Ibuprofen"
+    class_id: "dc_nsaids"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "206905"
+    name: "Ibuprofen 400 MG Oral Tablet [Ibu]"
+    ingredient: "Ibuprofen"
+    class_id: "dc_nsaids"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "212033"
+    name: "aspirin 325 MG Oral Tablet"
+    ingredient: "Aspirin"
+    class_id: "dc_nsaids"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "243670"
+    name: "aspirin 81 MG Oral Tablet"
+    ingredient: "Aspirin"
+    class_id: "dc_nsaids"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Cardiovascular / Antihypertensives
+  - code: "314076"
+    name: "lisinopril 10 MG Oral Tablet"
+    ingredient: "Lisinopril"
+    class_id: "dc_ace_inhibitors"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "314077"
+    name: "lisinopril 20 MG Oral Tablet"
+    ingredient: "Lisinopril"
+    class_id: "dc_ace_inhibitors"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "979467"
+    name: "Losartan Potassium 50 MG Oral Tablet"
+    ingredient: "Losartan Potassium"
+    class_id: "dc_arbs"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "310798"
+    name: "Hydrochlorothiazide 25 MG Oral Tablet"
+    ingredient: "Hydrochlorothiazide"
+    class_id: "dc_thiazides"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "308136"
+    name: "amLODIPine 2.5 MG Oral Tablet"
+    ingredient: "Amlodipine Besylate"
+    class_id: "dc_calcium_channel_blockers"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Antidiabetics
+  - code: "860975"
+    name: "24 HR Metformin hydrochloride 500 MG Extended Release Oral Tablet"
+    ingredient: "Metformin Hydrochloride"
+    class_id: "dc_biguanides"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Statins
+  - code: "617310"
+    name: "atorvastatin 20 MG Oral Tablet"
+    ingredient: "Atorvastatin Calcium"
+    class_id: "dc_statins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  - code: "617311"
+    name: "atorvastatin 40 MG Oral Tablet"
+    ingredient: "Atorvastatin Calcium"
+    class_id: "dc_statins"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Sulfonamides
+  - code: "198335"
+    name: "Sulfamethoxazole 800 MG / Trimethoprim 160 MG Oral Tablet"
+    ingredient: "Sulfamethoxazole and Trimethoprim"
+    class_id: "dc_sulfonamides"
+    formulary_tier: 1
+    formulary_status: "preferred"
+
+  # Opioids
+  - code: "864706"
+    name: "Oxycodone Hydrochloride 5 MG Oral Tablet"
+    ingredient: "Oxycodone Hydrochloride"
+    class_id: "dc_opioids"
+    formulary_tier: 2
+    formulary_status: "prior-auth-required"
+
+drug_interactions:
+  - drug_a_code: "314076"  # Lisinopril
+    drug_b_code: "310965"  # Ibuprofen
+    severity: "moderate"
+    effect: "NSAIDs reduce antihypertensive efficacy of ACE inhibitors and increase risk of acute renal failure."
+
+  - drug_a_code: "314076"  # Lisinopril
+    drug_b_code: "979467"  # Losartan
+    severity: "severe"
+    effect: "Dual renin-angiotensin system blockade increases risks of hypotension, hyperkalemia, and renal impairment."
+
+  - drug_a_code: "212033"  # Aspirin
+    drug_b_code: "310965"  # Ibuprofen
+    severity: "moderate"
+    effect: "Concurrent use increases gastrointestinal toxicity and Ibuprofen blunts Aspirin cardioprotective antiplatelet effect."
+
+  - drug_a_code: "860975"  # Metformin
+    drug_b_code: "309097"  # Cefuroxime
+    severity: "moderate"
+    effect: "Monitor renal parameters during cephalosporin administration to avoid metformin accumulation and lactic acidosis."

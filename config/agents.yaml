@@ -1,0 +1,28 @@
+# Agent token mappings for CareThread MCP and API dispatch
+# Maps bearer tokens to agent identity, role, and tenant scope.
+
+tokens:
+  tok_intake_01:
+    agent_id: agt_intake_01
+    role: intake
+    patient_scope: "*"
+  tok_specialist_01:
+    agent_id: agt_specialist_01
+    role: specialist
+    patient_scope: "*"
+  tok_pharmacy_01:
+    agent_id: agt_pharmacy_01
+    role: pharmacy
+    patient_scope: "*"
+  tok_clinician_01:
+    agent_id: agt_clinician_01
+    role: clinician
+    patient_scope: "*"
+  tok_admin_01:
+    agent_id: agt_admin_01
+    role: clinician_admin
+    patient_scope: "*"
+  tok_consolidator_01:
+    agent_id: agt_consolidator_01
+    role: consolidator
+    patient_scope: "*"

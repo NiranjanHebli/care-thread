@@ -1,10 +1,10 @@
 services:
   falkordb:
-    image: falkordb/falkordb:v0.5.2
+    image: falkordb/falkordb:latest
     container_name: carethread_falkordb
     environment:
-      - REDIS_ARGS=--appendonly yes --appendfsync everysec
-      - FALKORDB_ARGS=THREAD_COUNT 8 TIMEOUT_MAX 30000
+      - REDIS_ARGS=--appendonly yes --appendfsync everysec --auto-aof-rewrite-percentage 0
+      - FALKORDB_ARGS=THREAD_COUNT 8 TIMEOUT_MAX 30000 CACHE_SIZE 200
     volumes:
       - falkordb_data:/var/lib/falkordb/data
     ports:
@@ -16,6 +16,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+      start_period: 5s
 
 volumes:
   falkordb_data:
