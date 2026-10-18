@@ -12,7 +12,30 @@ export const NodeInspector: React.FC<NodeInspectorProps> = ({
   onClose,
   onWhyNotQuery,
 }) => {
-  if (!nodeData) return null;
+  if (!nodeData) {
+    return (
+      <div
+        className="glass-card"
+        id="node-inspector-placeholder"
+        style={{ marginTop: '12px' }}
+      >
+        <h4 style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+          Node Inspector
+        </h4>
+        <p
+          style={{
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+            marginTop: '6px',
+            lineHeight: 1.4,
+          }}
+        >
+          Click any node in the graph to inspect clinical properties,
+          timestamps, and confidence.
+        </p>
+      </div>
+    );
+  }
 
   // Filter out embedding vectors and internal cy properties per clinical requirements
   const filteredProperties = Object.entries(nodeData).filter(([key]) => {

@@ -184,6 +184,7 @@ def create_app(
                 results.append(
                     {
                         "id": pid,
+                        "patient_id": pid,
                         "name": name,
                         "gender": gender,
                         "birth_date": birth_date,
@@ -586,9 +587,7 @@ def create_app(
     # -------------------------------------------------------------------------
     ui_dist_path = os.getenv(
         "CT_UI_DIST",
-        os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "..", "ui", "dist")
-        ),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "ui", "dist")),
     )
     if os.path.exists(ui_dist_path):
         app.mount("/", StaticFiles(directory=ui_dist_path, html=True), name="ui")

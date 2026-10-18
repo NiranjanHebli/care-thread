@@ -135,8 +135,8 @@ sequenceDiagram
 ### Step 1: Environment Configuration
 Clone the repository and copy the sample environment file:
 ```bash
-git clone <repository-url>
-cd hackathon
+git clone https://github.com/NiranjanHebli/care-thread
+cd care-thread
 
 # Copy sample environment configuration
 cp .env.example .env
@@ -148,7 +148,7 @@ Start the containerized FalkorDB instance with append-only persistence:
 make up
 make health
 ```
-FalkorDB listens on port `6379` (Redis protocol) with Web Browser access on port `3000`.
+FalkorDB listens on port `6379` (Redis protocol) with FalkorDB Browser on port `3000`.
 
 ### Step 3: Install Python Dependencies
 Set up the virtual environment and install dependencies:
@@ -165,37 +165,36 @@ pip install -e ".[dev]"
 ```
 
 ### Step 4: Bootstrap Schema & Ingest Clinical Data
-Initialize schema constraints, vector indexes, and seed synthetic records:
+Initialize schema constraints, vector indexes, and seed clinical records:
 ```bash
-# 1. Initialize schema range indexes, unique constraints, and 384-dim vector indexes
+# 1. Initialize schema range indexes, unique constraints, and vector indexes
 make schema
 
 # 2. Seed shared clinic guidelines, formularies, and allergen interactions
 make seed-clinic
 
-# 3. Ingest synthetic patient history into isolated tenant graphs
+# 3. Ingest synthetic patient cohort (recommended fixture dataset; add --reset for clean reload)
+uv run python scripts/ingest.py --data-dir tests/fixtures/synthea_csv --workers 1 --reset
+
+# Or ingest full generated Synthea cohort (if generated in data/synthea/csv)
 make ingest
 ```
 
-### Step 5: Build and Run the Frontend (UI)
+### Step 5: Build the Frontend (UI)
 The frontend is built with React, Vite, TypeScript, and Cytoscape.js in `ui/`:
 ```bash
-# Install frontend dependencies
-cd ui && npm install
+# Install frontend dependencies and build production bundle
+make ui
 
-# Build static production bundle served by FastAPI
-npm run build
-cd ..
-
-# Alternatively, run hot-reload dev server (http://localhost:3000):
-cd ui && npm run dev
+# Or run manually:
+cd ui && npm install && npm run build && cd ..
 ```
 
 ### Step 6: Start the CareThread Application Server
 Launch the FastAPI REST, SSE streaming, and UI server:
 ```bash
 # Start server on port 8080
-PYTHONPATH=src uv run uvicorn carethread.api.app:app --host 127.0.0.1 --port 8080
+uv run python -m uvicorn carethread.api.app:app --host 127.0.0.1 --port 8080
 ```
 - **Web Console UI**: Visit [http://localhost:8080](http://localhost:8080) for the Cytoscape
   graph explorer, Agent Console, and Handoff Board.

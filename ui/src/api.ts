@@ -102,7 +102,10 @@ export async function fetchPatients(query = ''): Promise<PatientSummary[]> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch patients: ${res.statusText}`);
   const data = await res.json();
-  return data.patients || [];
+  return (data.patients || []).map((p: any) => ({
+    ...p,
+    patient_id: p.patient_id || p.id,
+  }));
 }
 
 export async function fetchPatientGraph(patientId: string, asOf?: string): Promise<GraphPayload> {
@@ -170,7 +173,16 @@ export async function fetchAuditLogs(patientId: string, limit = 100): Promise<Au
   );
   if (!res.ok) throw new Error(`Failed to fetch audit: ${res.statusText}`);
   const data = await res.json();
-  return data.events || [];
+  return (data.events || []).map((e: any) => ({
+    event_id: e.event_id || e.id,
+    timestamp:
+      e.timestamp || (e.ts ? new Date(e.ts * 1000).toLocaleTimeString() : '-'),
+    agent_role: e.agent_role || e.role || e.agent_id || 'system',
+    action: e.action || e.tool || e.op || 'operation',
+    patient_id: e.patient_id,
+    status: e.status || e.outcome || 'success',
+    latency_ms: e.latency_ms,
+  }));
 }
 
 export async function fetchMetricsText(): Promise<string> {

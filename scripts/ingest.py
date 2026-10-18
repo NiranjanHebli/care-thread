@@ -19,7 +19,7 @@ from pathlib import Path
 from carethread.db.client import get_db_client
 from carethread.db.schema import bootstrap_control_graph
 from carethread.db.tenant_router import TenantRouter
-from carethread.ingest.mapper import ingest_dataset
+from carethread.ingest.mapper import ingest_dataset, synthea_id_to_patient_id
 from carethread.ingest.synthea_csv import load_synthea_dataset
 from carethread.memory.embeddings import get_embedder
 
@@ -81,6 +81,11 @@ def main() -> int:
         default=None,
         help="Optional limit on number of patients to ingest.",
     )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Reset existing patient tenant graphs before ingesting for clean state.",
+    )
 
     args = parser.parse_args()
 
@@ -112,6 +117,17 @@ def main() -> int:
     router = TenantRouter(client)
     embedder = get_embedder(mode=args.embed_mode)
     logger.info(f"Using embedder: {embedder.__class__.__name__} (dim={embedder.dimension})")
+
+    if args.reset:
+        logger.info("Reset requested: purging patient tenant graphs before re-ingestion...")
+        for syn_id in dataset.patients:
+            pid = synthea_id_to_patient_id(syn_id)
+            router.deregister_patient(pid)
+            try:
+                router.graph(pid).delete()
+            except Exception:
+                pass
+        logger.info("Patient graphs reset complete.")
 
     # Execute ingestion with bounded concurrency
     result = ingest_dataset(

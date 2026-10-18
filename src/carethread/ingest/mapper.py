@@ -616,12 +616,14 @@ class PatientGraphMapper:
         expected_counts = dataset.patient_counts(synthea_patient_id)
         counts_res = target_graph.query(
             """
-            OPTIONAL MATCH (p:Patient) WITH count(p) AS patient_cnt
-            OPTIONAL MATCH (e:Episode) WITH patient_cnt, count(e) AS episode_cnt
-            OPTIONAL MATCH (f:Fact) WITH patient_cnt, episode_cnt, count(f) AS fact_cnt
-            OPTIONAL MATCH (cp:ClinicalProcedure)
+            OPTIONAL MATCH (p:Patient {data_provenance: 'synthea'}) WITH count(p) AS patient_cnt
+            OPTIONAL MATCH (e:Episode {data_provenance: 'synthea'})
+            WITH patient_cnt, count(e) AS episode_cnt
+            OPTIONAL MATCH (f:Fact {data_provenance: 'synthea'})
+            WITH patient_cnt, episode_cnt, count(f) AS fact_cnt
+            OPTIONAL MATCH (cp:ClinicalProcedure {data_provenance: 'synthea'})
             WITH patient_cnt, episode_cnt, fact_cnt, count(cp) AS proc_cnt
-            OPTIONAL MATCH (obs:Observation)
+            OPTIONAL MATCH (obs:Observation {data_provenance: 'synthea'})
             WITH patient_cnt, episode_cnt, fact_cnt, proc_cnt, count(obs) AS obs_cnt
             RETURN patient_cnt, episode_cnt, fact_cnt, proc_cnt, obs_cnt
             """

@@ -40,22 +40,73 @@ export const App: React.FC = () => {
   const [whyNotCandidateId, setWhyNotCandidateId] = useState<string>('');
   const [showWhyNot, setShowWhyNot] = useState(false);
 
-  // Load patients on mount or search
-  const loadPatients = useCallback(async (q = '') => {
+  // Load all patients on mount or refresh
+  const loadPatients = useCallback(async () => {
     try {
-      const list = await fetchPatients(q);
+      const list = await fetchPatients('');
       setPatients(list);
-      if (list.length > 0 && !selectedPatientId) {
-        setSelectedPatientId(list[0].patient_id);
+      if (list.length > 0) {
+        setSelectedPatientId((curr) => {
+          if (!curr || !list.some((p) => p.patient_id === curr)) {
+            const john = list.find((p) =>
+              (p.name || '').toLowerCase().includes('john doe')
+            );
+            return john ? john.patient_id : list[0].patient_id;
+          }
+          return curr;
+        });
       }
     } catch (err) {
       console.error('Failed to load patients:', err);
     }
-  }, [selectedPatientId]);
+  }, []);
 
   useEffect(() => {
     loadPatients();
   }, [loadPatients]);
+
+  // Derived filtered patients list based on search term
+  const filteredPatients = patients.filter((p) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.patient_id || '').toLowerCase().includes(q)
+    );
+  });
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    const q = query.trim().toLowerCase();
+    if (!q) return;
+    const match = patients.find(
+      (p) =>
+        (p.patient_id || '').toLowerCase() === q ||
+        (p.name || '').toLowerCase() === q ||
+        (p.name || '').toLowerCase().includes(q) ||
+        (p.patient_id || '').toLowerCase().includes(q)
+    );
+    if (match) {
+      setSelectedPatientId(match.patient_id);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const q = searchQuery.trim();
+      const match = patients.find(
+        (p) =>
+          (p.patient_id || '').toLowerCase() === q.toLowerCase() ||
+          (p.name || '').toLowerCase().includes(q.toLowerCase()) ||
+          (p.patient_id || '').toLowerCase().includes(q.toLowerCase())
+      );
+      if (match) {
+        setSelectedPatientId(match.patient_id);
+      } else if (q.startsWith('p_') || q.length > 3) {
+        setSelectedPatientId(q);
+      }
+    }
+  };
 
   // Load graph when patient or as-of changes
   const loadGraph = useCallback(async () => {
@@ -110,7 +161,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="app-wrapper">
       {/* 1. Mandatory Clinical Safety Banner */}
       <div className="safety-banner" id="clinical-safety-banner">
         <span>[SYNTHETIC DATA, NOT FOR CLINICAL USE]</span>
@@ -191,13 +242,11 @@ export const App: React.FC = () => {
             type="text"
             className="input-field"
             id="patient-search-input"
-            placeholder="Search patient name..."
+            placeholder="Search Name or Patient ID (e.g. p_2885b7c1d9a0)..."
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              loadPatients(e.target.value);
-            }}
-            style={{ width: '190px' }}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            style={{ width: '260px' }}
           />
 
           <select
@@ -207,17 +256,89 @@ export const App: React.FC = () => {
             onChange={(e) => setSelectedPatientId(e.target.value)}
             style={{ minWidth: '220px' }}
           >
-            {patients.map((p) => (
-              <option key={p.patient_id || Math.random()} value={p.patient_id || ''}>
-                {p.name || 'Unknown'} ({(p.patient_id || '').slice(0, 8)}...)
+            {filteredPatients.length === 0 && (
+              <option value="">No matching patients</option>
+            )}
+            {filteredPatients.map((p) => (
+              <option key={p.patient_id} value={p.patient_id}>
+                {p.name || 'Unknown'} ({p.patient_id})
               </option>
             ))}
           </select>
 
+          {/* Quick Demo Patient Selectors */}
+          <div
+            className="quick-patient-chips"
+            style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+          >
+            {[
+              { name: 'John Doe', id: 'p_2885b7c1d9a0' },
+              { name: 'Jane Smith', id: 'p_3bdc39be7d69' },
+              { name: 'Alice Williams', id: 'p_a1cdd3689525' },
+            ].map((demo) => {
+              const isSelected = selectedPatientId === demo.id;
+              return (
+                <button
+                  key={demo.id}
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setSelectedPatientId(demo.id);
+                    setSearchQuery('');
+                  }}
+                  style={{
+                    fontSize: '11px',
+                    padding: '3px 8px',
+                    borderRadius: '999px',
+                    backgroundColor: isSelected
+                      ? 'var(--accent-blue)'
+                      : 'rgba(255, 255, 255, 0.08)',
+                    color: isSelected ? '#ffffff' : 'var(--text-secondary)',
+                    border: isSelected
+                      ? '1px solid var(--accent-blue)'
+                      : '1px solid var(--border-subtle)',
+                    cursor: 'pointer',
+                  }}
+                  title={`Select ${demo.name} (${demo.id})`}
+                >
+                  {demo.name}
+                </button>
+              );
+            })}
+          </div>
+
+          {patients.find((p) => p.patient_id === selectedPatientId) && (
+            <span
+              id="active-patient-badge"
+              style={{
+                fontSize: '11px',
+                padding: '4px 10px',
+                borderRadius: '999px',
+                background: 'rgba(59, 130, 246, 0.15)',
+                border: '1px solid rgba(59, 130, 246, 0.35)',
+                color: '#93c5fd',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <strong>
+                {patients.find((p) => p.patient_id === selectedPatientId)?.name}
+              </strong>
+              <span style={{ opacity: 0.6 }}>|</span>
+              <span style={{ fontFamily: 'monospace' }}>
+                {selectedPatientId}
+              </span>
+            </span>
+          )}
+
           <button
             className="btn btn-secondary"
             id="refresh-btn"
-            onClick={loadGraph}
+            onClick={() => {
+              loadPatients();
+              loadGraph();
+            }}
             title="Refresh current graph"
           >
             Refresh

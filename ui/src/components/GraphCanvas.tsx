@@ -30,19 +30,21 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         {
           selector: 'node',
           style: {
-            label: 'data(label)',
+            label: 'data(display)',
             'color': '#f8fafc',
             'font-size': '11px',
             'text-valign': 'center',
             'text-halign': 'center',
-            'text-outline-color': '#0f172a',
+            'text-outline-color': '#0a0e17',
             'text-outline-width': '2px',
-            'background-color': '#475569',
-            'border-width': '1.5px',
-            'border-color': '#94a3b8',
-            width: '40px',
-            height: '40px',
-            'transition-property': 'background-color, border-color, opacity, width, height',
+            'background-color': '#334155',
+            'border-width': '2px',
+            'border-color': '#64748b',
+            width: '44px',
+            height: '44px',
+            'text-max-width': '95px',
+            'text-wrap': 'ellipsis',
+            'transition-property': 'background-color, border-color, opacity',
             'transition-duration': 0.2,
           },
         },
@@ -50,9 +52,11 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           selector: 'node[type = "Patient"]',
           style: {
             'background-color': '#2563eb',
+            'border-color': '#60a5fa',
             shape: 'ellipse',
-            width: '54px',
-            height: '54px',
+            width: '58px',
+            height: '58px',
+            'font-size': '12px',
             'font-weight': 'bold',
           },
         },
@@ -60,6 +64,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           selector: 'node[type = "Session"]',
           style: {
             'background-color': '#7c3aed',
+            'border-color': '#a78bfa',
             shape: 'hexagon',
             width: '46px',
             height: '46px',
@@ -69,55 +74,81 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           selector: 'node[type = "Episode"]',
           style: {
             'background-color': '#0d9488',
+            'border-color': '#2dd4bf',
             shape: 'round-rectangle',
-            width: '44px',
-            height: '44px',
+            width: '48px',
+            height: '48px',
           },
         },
         {
           selector: 'node[type = "Fact"]',
           style: {
             'background-color': '#059669',
+            'border-color': '#34d399',
             shape: 'diamond',
-            width: '42px',
-            height: '42px',
+            width: '46px',
+            height: '46px',
+            'font-size': '10px',
           },
         },
         {
           selector: 'node[type = "Observation"]',
           style: {
             'background-color': '#0284c7',
+            'border-color': '#38bdf8',
             shape: 'round-rectangle',
-            width: '38px',
-            height: '38px',
+            width: '40px',
+            height: '40px',
           },
         },
         {
           selector: 'node[type = "Answer"]',
           style: {
             'background-color': '#9333ea',
-            shape: 'star',
-            width: '50px',
-            height: '50px',
             'border-color': '#c084fc',
+            shape: 'star',
+            width: '54px',
+            height: '54px',
           },
         },
         {
           selector: 'node[type = "Handoff"]',
           style: {
             'background-color': '#ea580c',
+            'border-color': '#fb923c',
             shape: 'vee',
-            width: '44px',
-            height: '44px',
+            width: '46px',
+            height: '46px',
           },
         },
         {
           selector: 'node[type = "Flag"]',
           style: {
             'background-color': '#e11d48',
+            'border-color': '#fb7185',
             shape: 'triangle',
-            width: '42px',
-            height: '42px',
+            width: '46px',
+            height: '46px',
+          },
+        },
+        {
+          selector: 'node[type = "Organization"]',
+          style: {
+            'background-color': '#4f46e5',
+            'border-color': '#818cf8',
+            shape: 'round-rectangle',
+            width: '46px',
+            height: '46px',
+          },
+        },
+        {
+          selector: 'node[type = "Provider"]',
+          style: {
+            'background-color': '#0284c7',
+            'border-color': '#38bdf8',
+            shape: 'ellipse',
+            width: '44px',
+            height: '44px',
           },
         },
         {
@@ -141,8 +172,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             label: 'data(label)',
             'font-size': '9px',
             color: '#94a3b8',
-            'text-background-opacity': 0.8,
-            'text-background-color': '#0f172a',
+            'text-background-opacity': 0.85,
+            'text-background-color': '#0a0e17',
             'text-background-padding': '2px',
             'text-background-shape': 'roundrectangle',
           },
@@ -192,7 +223,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       layout: { name: 'cose', animate: false },
     });
 
-    cy.on('tap', 'node', (evt: EventObject) => {
+    cy.on('tap select', 'node', (evt: EventObject) => {
       const data = evt.target.data() as CytoscapeNodeData;
       onNodeSelect(data);
     });
@@ -204,8 +235,15 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     });
 
     cyRef.current = cy;
+    (window as any)._cy = cy;
+
+    const resizeObserver = new ResizeObserver(() => {
+      cy.resize();
+    });
+    resizeObserver.observe(containerRef.current);
 
     return () => {
+      resizeObserver.disconnect();
       cy.destroy();
     };
   }, [onNodeSelect]);
@@ -216,19 +254,34 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     if (!cy || !graphData) return;
 
     cy.elements().remove();
-    const nodes = graphData.elements.nodes || [];
-    const edges = graphData.elements.edges || [];
+    const rawNodes = graphData.elements.nodes || [];
+    const rawEdges = graphData.elements.edges || [];
 
-    cy.add([...nodes, ...edges]);
+    // Normalize node data for display and label matching
+    const nodes = rawNodes.map((n) => {
+      const d = { ...n.data };
+      const nodeType = d.type || d.label || 'Node';
+      return {
+        ...n,
+        data: {
+          ...d,
+          type: nodeType,
+          label: nodeType,
+          display: d.display || d.name || d.id,
+        },
+      };
+    });
+
+    cy.add([...nodes, ...rawEdges]);
 
     const layout = cy.layout({
       name: 'cose',
       animate: false,
-      idealEdgeLength: () => 90,
-      nodeOverlap: 20,
+      idealEdgeLength: () => 95,
+      nodeOverlap: 25,
     });
     layout.run();
-    cy.fit(undefined, 35);
+    cy.fit(undefined, 40);
   }, [graphData]);
 
   // Apply trace highlighting
@@ -340,14 +393,39 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
       <div id="cy-graph-container" ref={containerRef} />
 
+      {(!graphData || graphData.elements.nodes.length === 0) && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-muted)',
+            pointerEvents: 'none',
+            gap: '8px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '15px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
+            No Clinical Graph Nodes
+          </span>
+          <span style={{ fontSize: '12px' }}>
+            Select a patient or click a demo patient above to view graph.
+          </span>
+        </div>
+      )}
+
       <div className="graph-legend" id="graph-legend">
         <div className="legend-item">
           <div className="legend-dot" style={{ backgroundColor: '#2563eb' }} />
           <span>Patient</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot" style={{ backgroundColor: '#7c3aed' }} />
-          <span>Session</span>
         </div>
         <div className="legend-item">
           <div className="legend-dot" style={{ backgroundColor: '#0d9488' }} />
@@ -371,7 +449,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         </div>
         <div className="legend-item">
           <div className="legend-dot" style={{ backgroundColor: '#d97706' }} />
-          <span>Clinic Guideline</span>
+          <span>Clinic Rule</span>
         </div>
       </div>
     </div>
