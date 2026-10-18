@@ -354,12 +354,21 @@ make format
 
 ## Demo
 
-- **Video Walkthrough**: [TODO: add demo video link]
-- **Live Demo / Deployment**: [TODO: add live URL if hosted]
 - **Screenshots**:
-  - *Graph Exploration & Subgraph Highlight*: [TODO: add screenshot]
-  - *Agent Handoff Board & Flags*: [TODO: add screenshot]
-  - *"Why-Not" Provenance Drawer*: [TODO: add screenshot]
+  - *Graph Exploration & Subgraph Highlight*:
+
+    <img width="1456" height="733" alt="Screenshot 2026-10-18 at 8 21 32 PM" src="https://github.com/user-attachments/assets/4ebe7b40-b73b-4180-b58d-0520a601ce52" />
+  - *Agent Console*:
+
+    <img width="1439" height="734" alt="Screenshot 2026-10-18 at 8 25 22 PM" src="https://github.com/user-attachments/assets/e29e143b-a49d-4bfd-9efb-a6ddf04e340a" />
+  - *Handoffs and Safety*:
+<img width="1445" height="737" alt="Screenshot 2026-10-18 at 8 27 45 PM" src="https://github.com/user-attachments/assets/d946000a-709d-4e93-9952-3b5157da9bd4" />
+
+ - *Audit Trail*:
+  <img width="1440" height="731" alt="Screenshot 2026-10-18 at 8 26 49 PM" src="https://github.com/user-attachments/assets/e6ae6d55-8dca-4ef5-afa0-4c32e9c8cd36" />
+  - *Metrics*
+  <img width="1452" height="613" alt="Screenshot 2026-10-18 at 8 28 06 PM" src="https://github.com/user-attachments/assets/a50dcc7c-4dca-4cf3-b2a5-5f6d5a87bd28" />
+
 
 ---
 
