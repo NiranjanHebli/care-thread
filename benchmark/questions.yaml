@@ -1,0 +1,217 @@
+questions:
+  # Cross-Session Recall
+  - id: "q_csr_01"
+    patient_id: "p_000000000001"
+    session_id: "ses_maria_03"
+    category: "cross_session_recall"
+    question: "What appointment time preference did Maria express during her initial intake?"
+    gold_answer: "Maria prefers morning appointments before 10 AM."
+    gold_entities: ["morning", "10 AM"]
+    required_memory_ids: ["pref:morning_visits"]
+
+  - id: "q_csr_02"
+    patient_id: "p_000000000001"
+    session_id: "ses_maria_03"
+    category: "cross_session_recall"
+    question: "What severe allergy was documented for Maria Garcia?"
+    gold_answer: "Allergy to Penicillin causing hives and facial swelling."
+    gold_entities: ["penicillin", "allergy"]
+    required_memory_ids: ["allergy:300916003"]
+
+  - id: "q_csr_03"
+    patient_id: "p_000000000002"
+    session_id: "ses_john_03"
+    category: "cross_session_recall"
+    question: "What scheduling preference does John Doe have for his appointments?"
+    gold_answer: "John prefers late afternoon or evening appointments after 4 PM."
+    gold_entities: ["evening", "after 4 PM"]
+    required_memory_ids: ["pref:evening_appointments"]
+
+  - id: "q_csr_04"
+    patient_id: "p_000000000002"
+    session_id: "ses_john_03"
+    category: "cross_session_recall"
+    question: "What primary chronic cardiovascular condition was John diagnosed with?"
+    gold_answer: "Essential Hypertension."
+    gold_entities: ["hypertension"]
+    required_memory_ids: ["cond:59621000"]
+
+  - id: "q_csr_05"
+    patient_id: "p_000000000003"
+    session_id: "ses_robert_02"
+    category: "cross_session_recall"
+    question: "What critical medication allergy is documented for Robert Smith?"
+    gold_answer: "Allergy to Aspirin causing severe bronchospasm."
+    gold_entities: ["aspirin", "bronchospasm"]
+    required_memory_ids: ["allergy:293584003"]
+
+  - id: "q_csr_06"
+    patient_id: "p_000000000003"
+    session_id: "ses_robert_02"
+    category: "cross_session_recall"
+    question: "What respiratory inhaler does Robert use for asthma maintenance?"
+    gold_answer: "Albuterol inhaler 2 puffs every 4 to 6 hours as needed."
+    gold_entities: ["albuterol", "inhaler"]
+    required_memory_ids: ["med:albuterol"]
+
+  - id: "q_csr_07"
+    patient_id: "p_000000000004"
+    session_id: "ses_emily_03"
+    category: "cross_session_recall"
+    question: "What primary metabolic condition does Emily Davis have on record?"
+    gold_answer: "Hyperlipidemia."
+    gold_entities: ["hyperlipidemia"]
+    required_memory_ids: ["cond:55822004"]
+
+  - id: "q_csr_08"
+    patient_id: "p_000000000005"
+    session_id: "ses_michael_02"
+    category: "cross_session_recall"
+    question: "What joint condition and symptom did Michael Brown report at intake?"
+    gold_answer: "Osteoarthritis of knee with morning joint stiffness."
+    gold_entities: ["osteoarthritis", "stiffness"]
+    required_memory_ids: ["cond:239873007"]
+
+  # What Changed / Temporal Reasoning
+  - id: "q_chg_01"
+    patient_id: "p_000000000001"
+    session_id: "ses_maria_03"
+    category: "what_changed"
+    question: "What was Maria's metformin dose initially, and what was it increased to?"
+    gold_answer: "Maria was initially on 500 mg daily, increased to 1000 mg daily."
+    gold_entities: ["500 mg", "1000 mg"]
+    prior_value: "500 mg daily"
+    new_value: "1000 mg daily"
+    required_memory_ids: ["med:metformin"]
+
+  - id: "q_chg_02"
+    patient_id: "p_000000000002"
+    session_id: "ses_john_03"
+    category: "what_changed"
+    question: "How did John's blood pressure medication change over his visits?"
+    gold_answer: "Lisinopril 20 mg daily was discontinued and switched to losartan 50 mg daily."
+    gold_entities: ["lisinopril", "losartan 50 mg"]
+    prior_value: "lisinopril 20 mg daily"
+    new_value: "losartan 50 mg daily"
+    required_memory_ids: ["med:lisinopril"]
+
+  - id: "q_chg_03"
+    patient_id: "p_000000000004"
+    session_id: "ses_emily_03"
+    category: "what_changed"
+    question: "What happened to Emily's atorvastatin dosage after her muscle pain flare?"
+    gold_answer: "Emily's atorvastatin 20 mg daily was stopped and restarted at 10 mg daily."
+    gold_entities: ["stopped", "10 mg"]
+    prior_value: "20 mg daily"
+    new_value: "10 mg daily"
+    required_memory_ids: ["med:atorvastatin"]
+
+  - id: "q_chg_04"
+    patient_id: "p_000000000006"
+    session_id: "ses_sarah_03"
+    category: "what_changed"
+    question: "What diabetes medication was added to Sarah Connor's metformin regimen?"
+    gold_answer: "Sarah was on metformin alone, and glipizide 5 mg daily was added."
+    gold_entities: ["glipizide", "5 mg"]
+    prior_value: "metformin alone"
+    new_value: "glipizide 5 mg daily"
+    required_memory_ids: ["med:glipizide"]
+
+  # Multi-Hop Connected Data & Safety
+  - id: "q_mhop_01"
+    patient_id: "p_000000000001"
+    session_id: "ses_maria_03"
+    category: "multi_hop"
+    question: "Is amoxicillin safe to prescribe for Maria Garcia, and why or why not?"
+    gold_answer: "No, amoxicillin is contraindicated because Maria has a severe penicillin allergy."
+    gold_entities: ["contraindicated", "penicillin", "allergy"]
+    required_memory_ids: ["allergy:300916003"]
+
+  - id: "q_mhop_02"
+    patient_id: "p_000000000002"
+    session_id: "ses_john_03"
+    category: "multi_hop"
+    question: "Why was John's lisinopril discontinued in favor of an ARB?"
+    gold_answer: "Lisinopril was discontinued due to ACE-inhibitor dry cough side effect."
+    gold_entities: ["cough", "side effect", "discontinued"]
+    required_memory_ids: ["med:lisinopril"]
+
+  - id: "q_mhop_03"
+    patient_id: "p_000000000003"
+    session_id: "ses_robert_02"
+    category: "multi_hop"
+    question: "Can Robert Smith safely take high-dose ibuprofen for musculoskeletal pain?"
+    gold_answer: "No, ibuprofen is an NSAID cross-reactive with his severe aspirin allergy."
+    gold_entities: ["contraindicated", "aspirin", "nsaid"]
+    required_memory_ids: ["allergy:293584003"]
+
+  - id: "q_mhop_04"
+    patient_id: "p_000000000004"
+    session_id: "ses_emily_03"
+    category: "multi_hop"
+    question: "Why was Emily Davis restarted on 10mg atorvastatin instead of 20mg?"
+    gold_answer: "To reduce statin side effects after experiencing bilateral calf myalgia on 20mg."
+    gold_entities: ["myalgia", "muscle pain", "10 mg"]
+    required_memory_ids: ["med:atorvastatin"]
+
+  # Abstention / Negative Testing
+  - id: "q_abs_01"
+    patient_id: "p_000000000001"
+    session_id: "ses_maria_03"
+    category: "abstention"
+    is_abstention: true
+    question: "What is Maria Garcia's ABO blood type and Rh factor?"
+    gold_answer: "Not recorded in chart."
+    gold_entities: ["not recorded", "unknown"]
+    required_memory_ids: []
+
+  - id: "q_abs_02"
+    patient_id: "p_000000000002"
+    session_id: "ses_john_03"
+    category: "abstention"
+    is_abstention: true
+    question: "Does John Doe have a documented peanut allergy?"
+    gold_answer: "Not recorded in chart."
+    gold_entities: ["not recorded", "unknown"]
+    required_memory_ids: []
+
+  - id: "q_abs_03"
+    patient_id: "p_000000000003"
+    session_id: "ses_robert_02"
+    category: "abstention"
+    is_abstention: true
+    question: "What was Robert Smith's fasting serum glucose level at his last visit?"
+    gold_answer: "Not recorded in chart."
+    gold_entities: ["not recorded", "unknown"]
+    required_memory_ids: []
+
+  - id: "q_abs_04"
+    patient_id: "p_000000000004"
+    session_id: "ses_emily_03"
+    category: "abstention"
+    is_abstention: true
+    question: "What is Emily Davis's surgical history regarding cholecystectomy?"
+    gold_answer: "Not recorded in chart."
+    gold_entities: ["not recorded", "unknown"]
+    required_memory_ids: []
+
+  # Handoff Completeness
+  - id: "q_hnd_01"
+    patient_id: "p_000000000006"
+    session_id: "ses_sarah_02"
+    category: "handoff"
+    question: "What were the goal and state summary in the Intake-Specialist handoff for Sarah?"
+    gold_answer: "Goal: Endocrinology evaluation. State: HbA1c 8.6 despite metformin."
+    gold_entities: ["glycemic control", "HbA1c", "metformin"]
+    required_packet_fields: ["goal", "state_summary", "completed_actions", "open_questions"]
+    required_memory_ids: ["med:metformin"]
+
+  - id: "q_hnd_02"
+    patient_id: "p_000000000006"
+    session_id: "ses_sarah_03"
+    category: "handoff"
+    question: "What instructions and open questions were passed to the Pharmacist for Sarah Connor?"
+    gold_answer: "Counsel patient on hypoglycemia precautions with newly added glipizide."
+    gold_entities: ["hypoglycemia", "glipizide", "counseling"]
+    required_packet_fields: ["goal", "state_summary", "completed_actions", "open_questions"]
+    required_memory_ids: ["med:glipizide"]

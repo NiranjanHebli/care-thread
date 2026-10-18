@@ -173,7 +173,7 @@ make schema
 # 2. Seed shared clinic guidelines, formularies, and allergen interactions
 make seed-clinic
 
-# 3. Ingest synthetic patient cohort (recommended fixture dataset; add --reset for clean reload)
+# 3. Ingest synthetic patient cohort
 uv run python scripts/ingest.py --data-dir tests/fixtures/synthea_csv --workers 1 --reset
 
 # Or ingest full generated Synthea cohort (if generated in data/synthea/csv)
@@ -275,7 +275,7 @@ make format
 
 ## Team
 
-- **[TODO: Member Name]** - [TODO: Role / Contributions]
+- **[Niranjan Hebli]** - [TODO: Role / Contributions]
 - **[TODO: Member Name]** - [TODO: Role / Contributions]
 
 ---
