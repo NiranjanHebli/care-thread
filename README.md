@@ -299,13 +299,50 @@ make format
 
 ## Challenges and Learnings
 
-- [TODO: Challenges and key learnings faced during implementation]
+- **Bitemporal Fact Supersession vs Destructive Overwrites**:
+  Clinical observations change constantly as medications are titrated and allergies discovered.
+  Replacing naive node updates with a formal bitemporal model (`valid_time` vs `recorded_time`)
+  and atomic CAS supersession preserved full longitudinal audit history. Handling Cypher row
+  multiplication in `OPTIONAL MATCH` queries taught us to use `collect()` with conditional
+  `FOREACH` execution to prevent spurious node duplicates during concurrent writes.
+
+- **Tenant Isolation by Construction**:
+  Row-level filters and shared tables frequently suffer from prompt injection leaks and
+  developer oversight. Isolating each patient into a dedicated FalkorDB graph (`patient_<id>`)
+  alongside a read-only `clinic_shared` knowledge base eliminated cross-tenant data leakage by
+  design and enabled instantaneous cryptographic data erasure for GDPR compliance.
+
+- **Atomic Multi-Agent Coordination Handoffs**:
+  Autonomous clinical agents (Intake, Specialist, Pharmacy) can produce race conditions when
+  competing for unassigned referrals. Enforcing a formal handoff state machine (`draft` ->
+  `open` -> `accepted` -> `completed`) with atomic CAS status transitions ensured exactly-once
+  processing with zero duplicate accepts under high concurrent load.
+
+- **Machine-Verifiable Provenance & Counterfactual Ablation**:
+  LLM clinical recommendations require explainable attribution rather than opaque confidence
+  scores. Tying generated claims directly to graph fact IDs via `commit_answer` enabled
+  verifiable audit trails. Validating with counterfactual ablation proved that removing cited
+  evidence causes answer retraction, confirming genuine reasoning over retrieved chart data.
 
 ---
 
 ## Future Work
 
-- [TODO: Future improvements and planned features]
+- **HL7 FHIR R4 & SMART on FHIR Gateway**:
+  Native bi-directional streaming ingestion and synchronization with hospital EHRs (Epic, Cerner)
+  mapping FHIR `MedicationRequest`, `Condition`, and `Observation` resources to graph schemas.
+
+- **Real-Time Clinical Decision Support (CDS Hooks)**:
+  Sub-millisecond graph pattern matching for CDS Hooks (e.g., `order-select`, `patient-view`),
+  alerting prescribers to drug-drug interactions and organ clearance adjustments before submission.
+
+- **Enterprise High Availability & Geo-Replication**:
+  Deploying FalkorDB with persistent Raft consensus clustering across multi-region hospital
+  networks with automatic failover and zero-data-loss durability.
+
+- **Federated Privacy-Preserving Agent Optimization**:
+  Federated procedural playbook optimization across healthcare systems, refining multi-agent
+  clinical coordination protocols without sharing raw patient graph data.
 
 ---
 
