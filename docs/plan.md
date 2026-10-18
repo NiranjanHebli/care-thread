@@ -33,5 +33,5 @@
 
 ## Phase 5: Verification & Benchmarking
 - [x] **Step 20**: Isolation test suite (`tests/isolation/test_iso_*.py`).
-- [ ] **Step 21**: Load & concurrency test harness (`loadtest/`).
+- [x] **Step 21**: Load & concurrency test harness (`loadtest/`).
 - [ ] **Step 22**: 3-Way Benchmark report (Stateless vs Vector-only vs CareThread Graph Memory).

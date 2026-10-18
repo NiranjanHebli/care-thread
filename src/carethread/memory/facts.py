@@ -13,6 +13,7 @@ Features:
 from __future__ import annotations
 
 import logging
+import threading
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -138,6 +139,7 @@ class FactManager:
     ) -> None:
         self._router = router or TenantRouter(get_db_client())
         self._clock = clock or get_clock()
+        self._lock = threading.RLock()
 
     def get_fact(self, patient_id: str, fact_id: str) -> FactRecord | None:
         """Fetch a specific fact by ID."""
@@ -199,12 +201,44 @@ class FactManager:
         expected_version: int | None = None,
         half_life_days: int | None = None,
     ) -> dict[str, Any]:
-        """Store or update a semantic fact applying write rules and conflict policy.
+        """Store or update a semantic fact applying write rules and conflict policy."""
+        with self._lock:
+            return self._remember_fact_unlocked(
+                patient_id=patient_id,
+                kind=kind,
+                display=display,
+                value=value,
+                code=code,
+                system=system,
+                valid_from=valid_from,
+                valid_to=valid_to,
+                authority=authority,
+                caller_role=caller_role,
+                episode_id=episode_id,
+                message_id=message_id,
+                op_id=op_id,
+                expected_version=expected_version,
+                half_life_days=half_life_days,
+            )
 
-        Returns:
-            Dict containing action ('created', 'reinforced', 'superseded', 'disputed',
-            'pending_review'), fact record, and optional flags.
-        """
+    def _remember_fact_unlocked(
+        self,
+        patient_id: str,
+        kind: str,
+        display: str,
+        value: str = "",
+        code: str | None = None,
+        system: str | None = None,
+        valid_from: int | None = None,
+        valid_to: int | None = None,
+        authority: str | None = None,
+        caller_role: str | None = None,
+        episode_id: str | None = None,
+        message_id: str | None = None,
+        op_id: str | None = None,
+        expected_version: int | None = None,
+        half_life_days: int | None = None,
+    ) -> dict[str, Any]:
         valid_pid = self._router.validate_patient_id(patient_id)
         if kind not in VALID_FACT_KINDS:
             raise ValidationError(
@@ -408,6 +442,16 @@ class FactManager:
                 old.superseded_at = $now,
                 old.valid_to = coalesce(old.valid_to, $now),
                 old.version = old.version + 1
+            WITH p, old
+            OPTIONAL MATCH (p)-[:HAS_FACT]->(other:Fact {slot: old.slot, status: 'active'})
+            WHERE other.id <> old.id
+            WITH p, old, collect(other) AS others
+            FOREACH (o IN others |
+                SET o.status = 'superseded',
+                    o.superseded_at = $now,
+                    o.valid_to = coalesce(o.valid_to, $now),
+                    o.version = o.version + 1
+            )
             CREATE (new:Fact {
                 id: $fid, kind: old.kind, slot: old.slot, code: $code, system: $system,
                 display: $display, value: $value, status: 'active', valid_from: $valid_from,
@@ -507,6 +551,16 @@ class FactManager:
                 old.superseded_at = $now,
                 old.valid_to = coalesce(old.valid_to, $now),
                 old.version = old.version + 1
+            WITH p, old
+            OPTIONAL MATCH (p)-[:HAS_FACT]->(other:Fact {slot: old.slot, status: 'active'})
+            WHERE other.id <> old.id
+            WITH p, old, collect(other) AS others
+            FOREACH (o IN others |
+                SET o.status = 'superseded',
+                    o.superseded_at = $now,
+                    o.valid_to = coalesce(o.valid_to, $now),
+                    o.version = o.version + 1
+            )
             CREATE (new:Fact {
                 id: $fid, kind: old.kind, slot: old.slot, code: $code, system: $system,
                 display: $display, value: $value, status: 'active', valid_from: $valid_from,

@@ -384,9 +384,17 @@ class PatientGraphMapper:
 
         medications = dataset.medications_by_patient.get(synthea_patient_id, [])
         med_payload: list[dict[str, Any]] = []
+
+        # Find latest medication per slot without a stop date
+        latest_active_idx: dict[str, int] = {}
+        for idx, m in enumerate(medications):
+            if m.stop_ts is None and m.slot:
+                latest_active_idx[m.slot] = idx
+
         for idx, m in enumerate(medications):
             valid_from = m.start_ts or now_ts
             valid_to = m.stop_ts
+            is_active = (valid_to is None) and (latest_active_idx.get(m.slot) == idx)
             hash_key = f"{m.encounter_id}_{m.code}_{valid_from}_{valid_to}_{idx}".encode()
             med_id = f"fct_med_{hashlib.md5(hash_key).hexdigest()[:12]}"
             med_payload.append(
@@ -395,7 +403,7 @@ class PatientGraphMapper:
                     "slot": m.slot,
                     "code": m.code,
                     "display": m.description,
-                    "status": "active" if valid_to is None else "superseded",
+                    "status": "active" if is_active else "superseded",
                     "valid_from": valid_from,
                     "valid_to": valid_to,
                     "superseded_at": valid_to,
