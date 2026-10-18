@@ -242,17 +242,34 @@ uv run python scripts/ingest.py --data-dir data/synthea/csv
   ingredients (`normalize_med()`) for bitemporal facts and safety checks.
 - **Count Invariant**: Ingestion asserts that created FalkorDB nodes match source CSV rows.
 
-### Run Tests
+### Verification, Testing & Benchmarks
+
 ```bash
-# Run unit and integration tests (uses deterministic mock mode)
+# 1. Run unit and integration test suite (183 tests, deterministic mock mode)
 make test
 
-# Run tenant isolation test suite
+# 2. Run multi-tenant isolation verification suite (9 test suites)
 make test-iso
 
-# Run UI smoke tests via Playwright
+# 3. Run high-concurrency load and invariant verification harness
+make loadtest
+
+# 4. Run 3-way comparative benchmark (Stateless vs Vector-only vs CareThread)
+make bench
+
+# 5. Run UI smoke tests via Playwright
 cd ui && npx playwright test
 ```
+
+#### Benchmark & Verification Commands
+- `make test`: Executes all 183 unit and integration tests verifying graph memory, bitemporal
+  facts, handoff state machine, MCP tools, and provenance engine.
+- `make test-iso`: Verifies strict cryptographic tenant graph isolation, prompt injection
+  defense, cross-tenant denial logging, and right-to-be-forgotten deletion.
+- `make loadtest`: Launches concurrent multi-agent workers across tenant graphs, verifying
+  sub-15ms p95 latency and all 5 data integrity invariants (`reports/load_<timestamp>.md`).
+- `make bench`: Executes the 3-Way comparative evaluation across 6 longitudinal patient cohorts,
+  measuring recall, what-changed correctness, and claim support (`reports/bench_<timestamp>.md`).
 
 ### Code Formatting & Linting
 ```bash
