@@ -155,6 +155,86 @@ flowchart TD
 2. **Action & Coordination**: New observations are recorded with atomic supersession. Downstream tasks are passed via graph-stored `Handoff` packets.
 3. **Trace Commitment**: Answers cite graph node IDs; the system validates support, logs an audit trail, and generates the provenance subgraph.
 
+### Graph Data Model & Schema Map
+
+CareThread models clinical intelligence across two primary FalkorDB graph layers:
+an isolated tenant graph per patient (`patient_<id>`) and a shared institutional
+knowledge base (`clinic_shared`).
+
+```mermaid
+graph TD
+    subgraph PatientGraph["Patient Tenant Graph: patient_<id>"]
+        P["Patient<br/>(id, name, gender)"]
+        
+        %% Episodic Timeline
+        E1["Episode 1<br/>(synthea_encounter)"]
+        E2["Episode 2<br/>(live_visit)"]
+        E1 -->|"NEXT {gap_days: 30}"| E2
+        P -->|"HAS_EPISODE"| E1
+        P -->|"HAS_EPISODE"| E2
+        
+        %% Observations and Notes
+        Obs["Observation<br/>(code, value, unit)"]
+        Proc["ClinicalProcedure<br/>(code, display)"]
+        Note["Note<br/>(text, embedding)"]
+        E1 -->|"PRODUCED"| Obs
+        E1 -->|"PERFORMED"| Proc
+        E2 -->|"HAS_NOTE"| Note
+        
+        %% Semantic Facts and Supersession
+        F1["Fact: Med Old<br/>(Metformin 500mg)"]
+        F2["Fact: Med New<br/>(Metformin 1000mg)"]
+        Allergy["Fact: Allergy<br/>(Penicillin, 300916003)"]
+        P -->|"HAS_FACT"| F1
+        P -->|"HAS_FACT"| F2
+        P -->|"HAS_FACT"| Allergy
+        F2 -->|"SUPERSEDES"| F1
+        
+        %% Coordination and Safety
+        Handoff["Handoff<br/>(status, goal, packet)"]
+        Flag["SafetyFlag<br/>(allergy_conflict, high)"]
+        Ans["Answer<br/>(text, trace_id)"]
+        P -->|"HAS_HANDOFF"| Handoff
+        Flag -->|"ABOUT"| Allergy
+        Ans -->|"USED"| F2
+        Ans -->|"REJECTED"| F1
+    end
+
+    subgraph ClinicGraph["Shared Knowledge Graph: clinic_shared"]
+        GL["Guideline<br/>(Strep Pharyngitis)"]
+        Rule["Rule: Contraindication<br/>(cross_reactivity)"]
+        DClass["DrugClass<br/>(Beta-Lactam)"]
+        Drug1["Drug<br/>(Amoxicillin 500mg)"]
+        Drug2["Drug<br/>(Azithromycin 250mg)"]
+        AClass["AllergenClass<br/>(Penicillin Allergens)"]
+        ACode["AllergenCode<br/>(300916003)"]
+        
+        GL -->|"HAS_RULE"| Rule
+        GL -->|"RECOMMENDS"| DClass
+        Drug1 -->|"IN_CLASS"| DClass
+        ACode -->|"MEMBER_OF"| AClass
+        AClass -->|"CROSS_REACTS_WITH"| DClass
+        Rule -->|"BLOCKS"| Drug1
+        Rule -->|"SUBSTITUTES"| Drug2
+    end
+
+    Allergy -.->|"Cross-Graph Traversal"| ACode
+```
+
+#### Core Schema Elements
+
+- **Episodic Memory**: Discrete `Episode` nodes chained chronologically through
+  `NEXT` edges with computed `gap_days` to preserve clinical disease trajectory.
+- **Semantic Memory**: Patient facts (`Condition`, `Medication`, `Allergy`, `Symptom`)
+  with strict authority precedence (`record` > `clinician` > `patient_reported`)
+  and `SUPERSEDES` history chains.
+- **Procedural Memory**: Guideline rules and care playbooks in `clinic_shared` governing
+  cross-reactivity (`CROSS_REACTS_WITH`) and formulary alternatives.
+- **Working & Coordination Memory**: Inter-agent delegation packets (`Handoff`) managed
+  via atomic Compare-And-Swap (CAS) state transitions.
+- **Machine-Verifiable Provenance**: `Answer` nodes linked to cited facts via `USED`
+  and rejected alternative candidates via `REJECTED`.
+
 ### Agent Interaction Workflow
 
 The sequence below illustrates how clinical agents (Intake, Specialist, and Pharmacy) collaborate across visit stages via atomic graph handoffs and shared clinical rules:
