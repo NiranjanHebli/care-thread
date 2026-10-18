@@ -348,4 +348,5 @@ make format
 
 ## License
 
-[TODO: add license type, e.g., Apache-2.0 / MIT]
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+
