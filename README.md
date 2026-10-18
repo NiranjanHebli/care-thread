@@ -1,6 +1,16 @@
 # CareThread: A Clinic Visit Memory Layer for AI Agents
 
-> **One-Line Pitch**: A persistent, graph-backed memory and coordination layer that connects clinical AI agents across visits, tracks medical context over time, and delivers machine-checkable explainability.
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
+![FalkorDB](https://img.shields.io/badge/FalkorDB-1.0.8+-FF4500?logo=redis&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)
+![MCP](https://img.shields.io/badge/Model_Context_Protocol-1.0+-5A67D8?logoColor=white)
+![React](https://img.shields.io/badge/React-19.2+-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-3178C6?logo=typescript&logoColor=white)
+![Cytoscape](https://img.shields.io/badge/Cytoscape.js-3.30+-E53E3E?logoColor=white)
+![License](https://img.shields.io/badge/License-Apache_2.0-22C55E?logoColor=white)
+
+> **One-Line Pitch**: A persistent, graph-backed memory and coordination layer that connects
+> clinical AI agents across visits, tracks medical context, and delivers explainability.
 
 > **Track**: Agent Memory and Coordination  
 > **Status**: Hackathon Build v1.0  
